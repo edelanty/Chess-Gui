@@ -11,7 +11,6 @@ import com.evan.p2pChess.Color;
  */
 
 public abstract class Piece {
-    
     protected Integer[][] piecePosition;
     protected String pieceName;
     protected Integer pieceValue;
