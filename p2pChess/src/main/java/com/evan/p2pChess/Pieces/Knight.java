@@ -11,13 +11,13 @@ public class Knight extends Piece implements Movement {
     }
 
     @Override
-    public boolean isValidMove(Integer newX, Integer newY, Board board) {
+    public boolean isValidMove(Integer newRow, Integer newCol, Board board) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'isValidMove'");
     }
 
     @Override
-    public void move(Integer newX, Integer newY, Board board) {
+    public void move(Integer newRow, Integer newCol, Board board) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'move'");
     }

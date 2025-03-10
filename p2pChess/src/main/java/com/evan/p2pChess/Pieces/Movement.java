@@ -11,7 +11,7 @@ public interface Movement {
      * 
      * @return
      */
-    boolean isValidMove(Integer newX, Integer newY, Board board);
+    boolean isValidMove(Integer newRow, Integer newCol, Board board);
 
     /**
      * 
@@ -20,5 +20,5 @@ public interface Movement {
      * @param newY Move's y position
      * @param board Board state
      */
-    void move(Integer newX, Integer newY, Board board);
+    void move(Integer newRow, Integer newCol, Board board);
 }
