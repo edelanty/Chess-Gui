@@ -6,7 +6,7 @@ public class Tile {
     private Piece piece;
 
     public Tile() {
-        this.piece = null;
+        this.piece = null; //null represents empty tile
     }
 
     public Piece getPiece() {

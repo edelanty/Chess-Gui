@@ -17,5 +17,17 @@ public class Player {
         this.playerColor = color;
     }
 
+    //Getters
+    public Integer getPlayerPoints() {
+        return playerPoints;
+    }
+
+    //Setters
+
     
+
+    public void addPoints(Integer points) {
+        this.playerPoints += points;
+    }
+
 }

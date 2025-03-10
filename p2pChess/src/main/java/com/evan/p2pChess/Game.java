@@ -27,9 +27,8 @@ public class Game {
         gameWinner = time;
     }
 
-
     public void gameStart() {
-        Board gameBoard = new Board();
+        Board gameBoard = new Board(new Player("Evan", 0, Color.WHITE), new Player("AI", 0, Color.BLACK));
         gameBoard.resetBoard();
         gameBoard.printBoardToTerminal();
     }

@@ -11,15 +11,14 @@ public interface Movement {
      * 
      * @return
      */
-    boolean isValidMove(Piece piece, Integer newX, Integer newY, Board board);
+    boolean isValidMove(Integer newX, Integer newY, Board board);
 
     /**
      * 
      * 
-     * @param piece Given piece
      * @param newX Move's x position
      * @param newY Move's y position
      * @param board Board state
      */
-    void move(Piece piece, Integer newX, Integer newY, Board board);
+    void move(Integer newX, Integer newY, Board board);
 }

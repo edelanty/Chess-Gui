@@ -2,21 +2,22 @@ package com.evan.p2pChess.Pieces;
 
 import com.evan.p2pChess.Board;
 import com.evan.p2pChess.Color;
+import com.evan.p2pChess.Player;
 
 public class King extends Piece implements Movement {
 
-    public King(Integer[][] position, Color color) {
-        super(position, "King", 0, color);
+    public King(Integer[][] position, Color color, Player owner) {
+        super(position, "King", 0, color, owner);
     }
 
     @Override
-    public boolean isValidMove(Piece piece, Integer newX, Integer newY, Board board) {
+    public boolean isValidMove(Integer newX, Integer newY, Board board) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'isValidMove'");
     }
 
     @Override
-    public void move(Piece piece, Integer newX, Integer newY, Board board) {
+    public void move(Integer newX, Integer newY, Board board) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'move'");
     }
