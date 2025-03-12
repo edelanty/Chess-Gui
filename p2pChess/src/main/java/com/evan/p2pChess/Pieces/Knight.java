@@ -4,7 +4,7 @@ import com.evan.p2pChess.Board;
 import com.evan.p2pChess.Color;
 import com.evan.p2pChess.Player;
 
-public class Knight extends Piece implements Movement {
+public class Knight extends Piece {
 
     public Knight(Integer[][] position, Color color, Player owner) {
         super(position, "Knight", 3, color, owner);

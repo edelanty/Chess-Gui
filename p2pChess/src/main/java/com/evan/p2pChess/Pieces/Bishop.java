@@ -4,7 +4,7 @@ import com.evan.p2pChess.Board;
 import com.evan.p2pChess.Color;
 import com.evan.p2pChess.Player;
 
-public class Bishop extends Piece implements Movement {
+public class Bishop extends Piece {
 
     public Bishop(Integer[][] position, Color color, Player owner) {
         super(position, "Bishop", 3, color, owner);

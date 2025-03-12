@@ -86,4 +86,19 @@ public class AppTest {
         assertEquals(expectedCol, board.getPieceAt(expectedRow, expectedCol).getPieceCol()); //Found the expected col
     }
 
+    @Test
+    public void whitePawnBlockedMoving2SpacesTest() {
+        Player white = new Player("white", 0, Color.WHITE);
+        Pawn e2Pawn = new Pawn(new Integer[][]{{Board.WHITE_PAWN_ROW, Board.COL_E}}, Color.WHITE, white);
+        Board board = new Board(white, new Player("black", 0, Color.BLACK));
+        Integer expectedRow = Board.ROW_4, expectedCol = Board.COL_E;
+        //Setting up the pawn on the board and moving it
+        board.setPieceAt(e2Pawn.getPieceRow(), e2Pawn.getPieceCol(), e2Pawn);
+        e2Pawn.move(Board.ROW_4, Board.COL_E, board);
+        assertEquals(e2Pawn, board.getPieceAt(expectedRow, expectedCol)); //Found e2 pawn at the spot it moved
+        assertEquals(null, board.getPieceAt(Board.WHITE_PAWN_ROW, Board.COL_E)); //Check for null where the piece used to be
+        assertEquals(expectedRow, board.getPieceAt(expectedRow, expectedCol).getPieceRow()); //Found the expected row
+        assertEquals(expectedCol, board.getPieceAt(expectedRow, expectedCol).getPieceCol()); //Found the expected col
+    }
+
 }

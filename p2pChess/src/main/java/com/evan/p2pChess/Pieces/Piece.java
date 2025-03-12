@@ -10,8 +10,7 @@ import com.evan.p2pChess.Player;
  * 
  * @author Evan Delanty
  */
-
-public abstract class Piece {
+public abstract class Piece implements Movement {
     protected Integer[][] piecePosition;
     protected String pieceName;
     protected Integer pieceValue;
@@ -58,6 +57,28 @@ public abstract class Piece {
 
     public void setPieceCol(Integer newY) {
         piecePosition[0][1] = newY;
+    }
+
+    /**
+     * getPieceSymbol()
+     * 
+     * xxx
+     * 
+     * @return
+     */
+    public String getPieceSymbol() {
+        String symbol = "";
+
+        switch (this.getPieceName()) {
+            case "Pawn": symbol = this.getPieceColor() == Color.WHITE ? "♙" : "♟"; break;
+            case "Rook": symbol = this.getPieceColor() == Color.WHITE ? "♖" : "♜"; break;
+            case "Knight": symbol = this.getPieceColor() == Color.WHITE ? "♘" : "♞"; break;
+            case "Bishop": symbol = this.getPieceColor() == Color.WHITE ? "♗" : "♝"; break;
+            case "Queen": symbol = this.getPieceColor() == Color.WHITE ? "♕" : "♛"; break;
+            case "King": symbol = this.getPieceColor() == Color.WHITE ? "♔" : "♚"; break;
+        }
+
+        return symbol;
     }
 
 }

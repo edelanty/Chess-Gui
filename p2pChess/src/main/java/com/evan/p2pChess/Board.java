@@ -79,7 +79,7 @@ public class Board {
         //Inits pawns
         for (int i = 0; i < BOARD_SIZE; i++) {
             board[WHITE_PAWN_ROW][i].setPiece(new Pawn(new Integer[][]{{WHITE_PAWN_ROW, i}}, Color.WHITE, whitePlayer));
-            board[BLACK_PAWN_ROW][i].setPiece(new Pawn(new Integer[][]{{BLACK_BACK_ROW, i}}, Color.BLACK, blackPlayer));
+            board[BLACK_PAWN_ROW][i].setPiece(new Pawn(new Integer[][]{{BLACK_PAWN_ROW, i}}, Color.BLACK, blackPlayer));
         }
 
         //Inits rooks

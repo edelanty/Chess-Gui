@@ -9,12 +9,16 @@ public interface Movement {
      * 
      * Returns true or false depending on if the given move is valid or not.
      * 
-     * @return
+     * @param newX Move's x position
+     * @param newY Move's y position
+     * @param board Board state
      */
     boolean isValidMove(Integer newRow, Integer newCol, Board board);
 
     /**
+     * move()
      * 
+     * xxx
      * 
      * @param newX Move's x position
      * @param newY Move's y position

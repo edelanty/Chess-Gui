@@ -1,5 +1,7 @@
 package com.evan.p2pChess;
 
+import com.evan.p2pChess.Gui.*;
+
 public class Game {
     private Integer gameTime;
     private Integer gameWinner;
@@ -28,20 +30,9 @@ public class Game {
     }
 
     public void gameStart() {
-        Board gameBoard = new Board(new Player("Evan", 0, Color.WHITE), new Player("AI", 0, Color.BLACK));
-        gameBoard.resetBoard();
-        gameBoard.printBoardToTerminal();
-    }
-
-    /**
-     * 
-     * 
-     * @return The winner of the game: 1 = P1, 2 = P2, ..., n = Pn
-     */
-    public Integer isGameWon() {
-        //TODO If King is dead opposite side wins
-
-        return getGameWinner();
+        //Creates and runs the panels and event listeners for the guis
+        Gui gui = new Gui();
+        gui.runGui();
     }
 
 }
