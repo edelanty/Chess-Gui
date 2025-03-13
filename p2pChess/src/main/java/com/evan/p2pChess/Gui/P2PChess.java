@@ -22,9 +22,13 @@ public class P2PChess {
     private int selectedRow;
     private int selectedCol;
     private boolean whiteTurn;
+    private int moveNumber;
 
     private Color PRIMARY_COLOR;
     private Color ALTERNATIVE_COLOR;
+
+    private JTextArea whiteMovesArea;
+    private JTextArea blackMovesArea;
 
     private static final int PIECE_SIZE = 50;
 
@@ -39,6 +43,7 @@ public class P2PChess {
         this.selectedRow = -1;
         this.selectedCol = -1;
         this.whiteTurn = true;
+        this.moveNumber = 0;
         this.PRIMARY_COLOR = Settings.WHITE_COLOR;
         this.ALTERNATIVE_COLOR = Settings.BROWN_COLOR;
     }
@@ -54,6 +59,7 @@ public class P2PChess {
     private void setupGui() {
         board.resetBoard();
         chessBoardPanel.add(createChessBoardPanel(), BorderLayout.CENTER);
+        chessBoardPanel.add(createMoveHistoryPanel(), BorderLayout.EAST);
     }
 
     /**
@@ -75,11 +81,44 @@ public class P2PChess {
                 createTileActionListener(tileButton, row, col);
                 assignTileColor(tileButton, row, col);
 
+                tileButton.setFocusable(false);
+
                 gridPanel.add(tileButton);
             }
         }
 
         return gridPanel;
+    }
+
+    private JPanel createMoveHistoryPanel() {
+        JPanel moveListPanel = new JPanel(new GridLayout(2, 1));
+
+        whiteMovesArea = new JTextArea();
+        blackMovesArea = new JTextArea();
+
+        whiteMovesArea.setEditable(false);
+        whiteMovesArea.setFocusable(false);
+        blackMovesArea.setEditable(false);
+        blackMovesArea.setFocusable(false);
+
+        whiteMovesArea.setFont(new Font("Serif", Font.PLAIN, 25));
+        blackMovesArea.setFont(new Font("Serif", Font.PLAIN, 25));
+
+        JPanel whitePanel = new JPanel(new BorderLayout());
+        whitePanel.setBorder(BorderFactory.createTitledBorder(whitePlayer.getPlayerName()));
+        whitePanel.add(new JScrollPane(whiteMovesArea), BorderLayout.CENTER);
+
+        JPanel blackPanel = new JPanel(new BorderLayout());
+        blackPanel.setBorder(BorderFactory.createTitledBorder(blackPlayer.getPlayerName()));
+        blackPanel.add(new JScrollPane(blackMovesArea), BorderLayout.CENTER);
+
+        whiteMovesArea.setText("                       ");
+        blackMovesArea.setText("                       ");
+
+        moveListPanel.add(whitePanel);
+        moveListPanel.add(blackPanel);
+
+        return moveListPanel;
     }
 
     /**
@@ -94,21 +133,33 @@ public class P2PChess {
         Piece clickedPiece = board.getPieceAt(row, col);
 
         if (selectedRow == -1 && clickedPiece != null && isCorrectTurn(clickedPiece)) { //Player hasn't clicked anything yet and has just selected a piece
+            //Keep track of previous selected tile information to display on the GUI 
             selectedRow = row;
             selectedCol = col;
+
             tileButtons[row][col].setBorder(BorderFactory.createLineBorder(java.awt.Color.RED, 3));
+            tileButtons[row][col].setBackground(new Color(255, 0, 0, 128));
         } else if (selectedRow != -1) { //This means we've clicked a piece and are about to try and move it
             Piece selectedPiece = board.getPieceAt(selectedRow, selectedCol);
+            
             if (selectedPiece != null && selectedPiece.isValidMove(row, col, board)) {
                 selectedPiece.move(row, col, board);
                 refreshBoardDisplay();
+                updateMoveListDisplay(selectedPiece, selectedRow, selectedCol, row, col);
                 whiteTurn = !whiteTurn;
-            } else { //Something went wrong
-                //TODO user feedback
+            } else {
+                //TODO user feedback for invalid move
             }
 
             //Reset for next click
-            tileButtons[selectedRow][selectedCol].setBorder(null);
+            JButton tempButton = new JButton();
+            tileButtons[selectedRow][selectedCol].setBorder(tempButton.getBorder()); //Resets to the proper border after moving
+            if ((selectedRow + selectedCol) % 2 == 0) {
+                tileButtons[selectedRow][selectedCol].setBackground(PRIMARY_COLOR);
+            } else {
+                tileButtons[selectedRow][selectedCol].setBackground(ALTERNATIVE_COLOR);
+            }
+
             selectedRow = -1;
             selectedCol = -1;
         }
@@ -173,6 +224,38 @@ public class P2PChess {
     }
 
     /**
+     * updateMoveListDisplay()
+     * 
+     * Adds to the players movelist and displays the move history on the GUI.
+     * 
+     * @param piece
+     * @param row
+     * @param col
+     */
+    private void updateMoveListDisplay(Piece piece, int prevRow, int prevCol, int row, int col) {
+        //Formatting the string to enter the queue
+        String from = convertToAlgebraic(prevRow, prevCol);
+        String to = convertToAlgebraic(row, col);
+        String moveNotation = piece.getPieceSymbol() + " " + from + " → " + to;
+
+        //Resets move history box if it's the first move
+        if (moveNumber == 0 && whiteTurn) {
+            whiteMovesArea.setText("");
+            blackMovesArea.setText("");
+        }
+
+        //Inserts into the player queue and updates the GUI
+        if (piece.getPieceColor() == com.evan.p2pChess.Color.WHITE) {
+            whitePlayer.addPlayerMove(moveNumber + ". " + moveNotation);
+            whiteMovesArea.append(moveNumber + ". " + moveNotation + "\n");
+        } else {
+            blackPlayer.addPlayerMove(moveNumber + ". " + moveNotation);
+            blackMovesArea.append(moveNumber + ". " + moveNotation + "\n");
+            moveNumber++;
+        }
+    }
+
+    /**
      * assignTileColor()
      * 
      * Assigning each color based on which tile we are currently on.
@@ -187,6 +270,21 @@ public class P2PChess {
         } else {
             button.setBackground(ALTERNATIVE_COLOR);
         }
+    }
+
+    /**
+     * convertToAlgebraic()
+     * 
+     * Formats string for move history.
+     * 
+     * @param row
+     * @param col
+     * @return
+     */
+    private String convertToAlgebraic(int row, int col) {
+        char file = (char) ('a' + col);
+        int rank = 8 - row;
+        return file + String.valueOf(rank);
     }
 
     /**

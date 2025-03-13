@@ -35,10 +35,6 @@ public class Pawn extends Piece {
         Integer curRow = this.getPieceRow();
         Integer curCol = this.getPieceCol();
 
-        System.out.println(newRow);
-        System.out.println(curRow);
-        System.out.println(direction);
-
         if (newRow == curRow + direction && newCol == curCol && board.getPieceAt(newRow, newCol) == null) {
             isValidMove = true; //Normal 1 step movement (if new row is + direction and it's same column and it's an empty tile ahead, return true)
         } else if (!getHasMoved() && newRow == curRow + (direction * 2) && newCol == curCol && board.getPieceAt(curRow + direction, curCol) == null && board.getPieceAt(newRow, newCol) == null) {
@@ -51,8 +47,6 @@ public class Pawn extends Piece {
         } else {
             isValidMove = false;
         }
-
-        System.out.println("Move:" + isValidMove);
 
         return isValidMove;
     }
