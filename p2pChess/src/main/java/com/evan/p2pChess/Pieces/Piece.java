@@ -132,10 +132,6 @@ public abstract class Piece implements Movement {
         boolean isStraightPathClear = true;
         Integer direction = 0, tempRow = 0, tempCol = 0;
 
-        if (curRow != newRow && curCol != newCol) { //Checking for if the move is actually straight
-            isStraightPathClear = false;
-        }
-
         if (curRow == newRow) { //If moving horizontally across columns
             direction = (newCol > curRow) ? 1 : -1;
             tempCol = curCol + direction;

@@ -159,4 +159,51 @@ public class P2PChessTest {
         assertEquals(expectedCol, board.getPieceAt(expectedRow, expectedCol).getPieceCol()); //Found the expected col
     }
 
+    //Rook movement tests
+    @Test
+    public void whiteRookA1toA4MoveTest() {
+        Player white = new Player("white", 0, Color.WHITE);
+        Rook a1Rook = new Rook(new Integer[][]{{Board.WHITE_BACK_ROW, Board.COL_A}}, Color.WHITE, white);
+        Board board = new Board(white, new Player("black", 0, Color.BLACK));
+        Integer expectedRow = Board.ROW_4, expectedCol = Board.COL_A;
+        //Putting rook on the board
+        board.setPieceAt(a1Rook.getPieceRow(), a1Rook.getPieceCol(), a1Rook);
+        a1Rook.move(expectedRow, expectedCol, board);
+        assertEquals(a1Rook, board.getPieceAt(expectedRow, expectedCol));
+        assertEquals(null, board.getPieceAt(Board.WHITE_BACK_ROW, Board.COL_A));
+        assertEquals(expectedRow, board.getPieceAt(expectedRow, expectedCol).getPieceRow());
+        assertEquals(expectedCol, board.getPieceAt(expectedRow, expectedCol).getPieceCol());
+    }
+
+    @Test
+    public void whiteRookA1toA4BlockedMoveTest() {
+        Player white = new Player("white", 0, Color.WHITE);
+        Pawn a2Pawn = new Pawn(new Integer[][]{{Board.WHITE_PAWN_ROW, Board.COL_A}}, Color.WHITE, white);
+        Rook a1Rook = new Rook(new Integer[][]{{Board.WHITE_BACK_ROW, Board.COL_A}}, Color.WHITE, white);
+        Board board = new Board(white, new Player("black", 0, Color.BLACK));
+        Integer expectedRow = Board.WHITE_BACK_ROW, expectedCol = Board.COL_A;
+        //Putting rook and pawn on the board
+        board.setPieceAt(a2Pawn.getPieceRow(), a2Pawn.getPieceCol(), a2Pawn);
+        board.setPieceAt(a1Rook.getPieceRow(), a1Rook.getPieceCol(), a1Rook);
+        a1Rook.move(Board.ROW_4, Board.COL_A, board);
+        assertEquals(a1Rook, board.getPieceAt(expectedRow, expectedCol));
+        assertEquals(expectedRow, board.getPieceAt(expectedRow, expectedCol).getPieceRow());
+        assertEquals(expectedCol, board.getPieceAt(expectedRow, expectedCol).getPieceCol());
+    }
+
+    @Test
+    public void blackRookH8toH5MoveTest() {
+        Player black = new Player("black", 0, Color.BLACK);
+        Rook h8Rook = new Rook(new Integer[][]{{Board.BLACK_BACK_ROW, Board.COL_H}}, Color.BLACK, black);
+        Board board = new Board(new Player("white", 0, Color.WHITE), black);
+        Integer expectedRow = Board.ROW_5, expectedCol = Board.COL_H;
+        //Putting rook on the board
+        board.setPieceAt(h8Rook.getPieceRow(), h8Rook.getPieceCol(), h8Rook);
+        h8Rook.move(expectedRow, expectedCol, board);
+        assertEquals(h8Rook, board.getPieceAt(expectedRow, expectedCol));
+        assertEquals(null, board.getPieceAt(Board.BLACK_BACK_ROW, Board.COL_H));
+        assertEquals(expectedRow, board.getPieceAt(expectedRow, expectedCol).getPieceRow());
+        assertEquals(expectedCol, board.getPieceAt(expectedRow, expectedCol).getPieceCol());
+    }
+
 }
