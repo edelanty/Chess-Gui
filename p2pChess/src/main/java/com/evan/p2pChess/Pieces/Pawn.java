@@ -54,8 +54,8 @@ public class Pawn extends Piece {
     @Override
     public void move(Integer newRow, Integer newCol, Board board) {
         if (isValidMove(newRow, newCol, board)) {
-            Integer oldRow = this.getPieceRow();
-            Integer oldCol = this.getPieceCol();
+            Integer curRow = this.getPieceRow();
+            Integer curCol = this.getPieceCol();
 
             Piece captured = board.getPieceAt(newRow, newCol);
 
@@ -70,7 +70,7 @@ public class Pawn extends Piece {
             }
 
             //Remove old position from board
-            board.setPieceAt(oldRow, oldCol, null);
+            board.setPieceAt(curRow, curCol, null);
 
             //Update piece position
             this.setPieceRow(newRow);
@@ -82,5 +82,5 @@ public class Pawn extends Piece {
             System.out.println("Invalid Move"); 
         }
     }
-    
+    //TODO code en passant
 }

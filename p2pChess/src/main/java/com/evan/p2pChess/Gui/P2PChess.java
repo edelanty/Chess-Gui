@@ -145,7 +145,7 @@ public class P2PChess {
         JPanel blackCapturedPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         blackCapturedPanel.setBorder(BorderFactory.createTitledBorder("Black Captured Pieces"));
         blackCapturedPieceArea = new JLabel();
-        blackCapturedPieceArea.setFont(new Font("Serif", Font.PLAIN, 20));
+        blackCapturedPieceArea.setFont(new Font("Serif", Font.PLAIN, 25));
         blackCapturedPieceArea.setText(" ");
 
         blackScore = new JTextField();
@@ -172,7 +172,7 @@ public class P2PChess {
         JPanel whiteCapturedPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         whiteCapturedPanel.setBorder(BorderFactory.createTitledBorder("White Captured Pieces"));
         whiteCapturedPieceArea = new JLabel();
-        whiteCapturedPieceArea.setFont(new Font("Serif", Font.PLAIN, 20));
+        whiteCapturedPieceArea.setFont(new Font("Serif", Font.PLAIN, 25));
         whiteCapturedPieceArea.setText(" ");
 
         whiteScore = new JTextField();
@@ -206,7 +206,7 @@ public class P2PChess {
 
             //Visual effect for selecting a piece
             tileButtons[row][col].setBorder(BorderFactory.createLineBorder(java.awt.Color.RED, 3));
-            tileButtons[row][col].setBackground(new Color(255, 0, 0, 128));
+            tileButtons[row][col].setBackground(Settings.RED_COLOR);
         } else if (selectedRow != -1) { //This means we've clicked a piece and are about to try and move it
             Piece selectedPiece = board.getPieceAt(selectedRow, selectedCol);
             Piece destinationPiece = board.getPieceAt(row, col);
