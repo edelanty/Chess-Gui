@@ -10,7 +10,7 @@ import com.evan.p2pChess.Pieces.*;
 /**
  * Unit test for simple App.
  */
-public class AppTest {
+public class P2PChessTest {
     
     /**
      * Rigorous Test :-)
@@ -19,6 +19,15 @@ public class AppTest {
     public void shouldAnswerWithTrue() {
         assertTrue(true);
     }
+
+    //Player value tests
+
+    @Test
+    public void capturedPieceQueueUpdateTest() {
+        //TODO
+    }
+
+    //Pawn movement tests
 
     @Test
     public void whitePawnE2toE4MoveTest() {
@@ -100,5 +109,7 @@ public class AppTest {
         assertEquals(expectedRow, board.getPieceAt(expectedRow, expectedCol).getPieceRow()); //Found the expected row
         assertEquals(expectedCol, board.getPieceAt(expectedRow, expectedCol).getPieceCol()); //Found the expected col
     }
+
+    // movement tests
 
 }

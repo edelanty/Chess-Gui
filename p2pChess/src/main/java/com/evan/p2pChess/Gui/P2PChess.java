@@ -9,6 +9,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Map;
 
 public class P2PChess {
     private JPanel chessBoardPanel;
@@ -29,6 +31,13 @@ public class P2PChess {
 
     private JTextArea whiteMovesArea;
     private JTextArea blackMovesArea;
+    private JLabel whiteCapturedPieceArea;
+    private JLabel blackCapturedPieceArea;
+    private JTextField whiteScore;
+    private JTextField blackScore;
+
+    private Map<String, Integer> whiteCapturedPieces;
+    private Map<String, Integer> blackCapturedPieces;
 
     private static final int PIECE_SIZE = 50;
 
@@ -38,12 +47,14 @@ public class P2PChess {
         this.chessBoardPanel = new JPanel(new BorderLayout());
         this.whitePlayer = new Player("white", 0, com.evan.p2pChess.Color.WHITE);
         this.blackPlayer = new Player("black", 0, com.evan.p2pChess.Color.BLACK);
+        this.whiteCapturedPieces = new HashMap<>();
+        this.blackCapturedPieces = new HashMap<>();
         this.board = new Board(whitePlayer, blackPlayer);
         this.tileButtons = new JButton[Board.BOARD_SIZE][Board.BOARD_SIZE];
         this.selectedRow = -1;
         this.selectedCol = -1;
         this.whiteTurn = true;
-        this.moveNumber = 0;
+        this.moveNumber = 1;
         this.PRIMARY_COLOR = Settings.WHITE_COLOR;
         this.ALTERNATIVE_COLOR = Settings.BROWN_COLOR;
     }
@@ -60,6 +71,8 @@ public class P2PChess {
         board.resetBoard();
         chessBoardPanel.add(createChessBoardPanel(), BorderLayout.CENTER);
         chessBoardPanel.add(createMoveHistoryPanel(), BorderLayout.EAST);
+        chessBoardPanel.add(createBlackCapturedPiecePanel(), BorderLayout.NORTH);
+        chessBoardPanel.add(createWhiteCapturedPiecePanel(), BorderLayout.SOUTH);
     }
 
     /**
@@ -112,13 +125,67 @@ public class P2PChess {
         blackPanel.setBorder(BorderFactory.createTitledBorder(blackPlayer.getPlayerName()));
         blackPanel.add(new JScrollPane(blackMovesArea), BorderLayout.CENTER);
 
-        whiteMovesArea.setText("                       ");
-        blackMovesArea.setText("                       ");
+        whiteMovesArea.setPreferredSize(new Dimension(140, 0));
+        blackMovesArea.setPreferredSize(new Dimension(140, 0));
 
         moveListPanel.add(whitePanel);
         moveListPanel.add(blackPanel);
 
         return moveListPanel;
+    }
+
+    /**
+     * createBlackCapturedPiecePanel()
+     * 
+     * Creates the captured piece panel and returns it to be put into the chessBoardPanel
+     * 
+     * @return the captured piece JPanel
+     */
+    private JPanel createBlackCapturedPiecePanel() {
+        JPanel blackCapturedPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        blackCapturedPanel.setBorder(BorderFactory.createTitledBorder("Black Captured Pieces"));
+        blackCapturedPieceArea = new JLabel();
+        blackCapturedPieceArea.setFont(new Font("Serif", Font.PLAIN, 20));
+        blackCapturedPieceArea.setText(" ");
+
+        blackScore = new JTextField();
+        blackScore.setFont(new Font("Serif", Font.PLAIN, 25));
+        blackScore.setFocusable(false);
+        blackScore.setBorder(null);
+        blackScore.setEditable(false);
+        blackScore.setText("Score: " + blackPlayer.getPlayerPoints().toString());
+
+        blackCapturedPanel.add(blackScore);
+        blackCapturedPanel.add(blackCapturedPieceArea);
+
+        return blackCapturedPanel;
+    }
+    
+    /**
+     * createWhiteCapturedPiecePanel()
+     * 
+     * Creates the captured piece panel and returns it to be put into the chessBoardPanel
+     * 
+     * @return the captured piece JPanel
+     */
+    private JPanel createWhiteCapturedPiecePanel() {
+        JPanel whiteCapturedPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        whiteCapturedPanel.setBorder(BorderFactory.createTitledBorder("White Captured Pieces"));
+        whiteCapturedPieceArea = new JLabel();
+        whiteCapturedPieceArea.setFont(new Font("Serif", Font.PLAIN, 20));
+        whiteCapturedPieceArea.setText(" ");
+
+        whiteScore = new JTextField();
+        whiteScore.setFont(new Font("Serif", Font.PLAIN, 25));
+        whiteScore.setFocusable(false);
+        whiteScore.setBorder(null);
+        whiteScore.setEditable(false);
+        whiteScore.setText("Score: " + blackPlayer.getPlayerPoints().toString());
+
+        whiteCapturedPanel.add(whiteScore);
+        whiteCapturedPanel.add(whiteCapturedPieceArea);
+
+        return whiteCapturedPanel;
     }
 
     /**
@@ -137,12 +204,15 @@ public class P2PChess {
             selectedRow = row;
             selectedCol = col;
 
+            //Visual effect for selecting a piece
             tileButtons[row][col].setBorder(BorderFactory.createLineBorder(java.awt.Color.RED, 3));
             tileButtons[row][col].setBackground(new Color(255, 0, 0, 128));
         } else if (selectedRow != -1) { //This means we've clicked a piece and are about to try and move it
             Piece selectedPiece = board.getPieceAt(selectedRow, selectedCol);
-            
-            if (selectedPiece != null && selectedPiece.isValidMove(row, col, board)) {
+            Piece destinationPiece = board.getPieceAt(row, col);
+
+            if (selectedPiece != null && selectedPiece.isValidMove(row, col, board)) { //Executed after successful move
+                checkForCapture(destinationPiece, selectedPiece);
                 selectedPiece.move(row, col, board);
                 refreshBoardDisplay();
                 updateMoveListDisplay(selectedPiece, selectedRow, selectedCol, row, col);
@@ -185,6 +255,20 @@ public class P2PChess {
         }
 
         return isCorrectTurn;
+    }
+
+    /**
+     * checkForCapture()
+     * 
+     * Check if a capture will happen and update the capture display (before we "move" our other piece)
+     * 
+     * @param destinationPiece
+     * @param selectedPiece
+     */
+    private void checkForCapture(Piece destinationPiece, Piece selectedPiece) {
+        if (destinationPiece != null && destinationPiece.getPieceColor() != selectedPiece.getPieceColor()) {
+            updateCapturedPieceDisplay(destinationPiece);
+        }
     }
 
     /**
@@ -238,12 +322,6 @@ public class P2PChess {
         String to = convertToAlgebraic(row, col);
         String moveNotation = piece.getPieceSymbol() + " " + from + " → " + to;
 
-        //Resets move history box if it's the first move
-        if (moveNumber == 0 && whiteTurn) {
-            whiteMovesArea.setText("");
-            blackMovesArea.setText("");
-        }
-
         //Inserts into the player queue and updates the GUI
         if (piece.getPieceColor() == com.evan.p2pChess.Color.WHITE) {
             whitePlayer.addPlayerMove(moveNumber + ". " + moveNotation);
@@ -253,7 +331,38 @@ public class P2PChess {
             blackMovesArea.append(moveNumber + ". " + moveNotation + "\n");
             moveNumber++;
         }
+
+        //Update scores as well
+        whiteScore.setText(whitePlayer.getPlayerPoints().toString());
+        blackScore.setText(blackPlayer.getPlayerPoints().toString());
     }
+
+    private void updateCapturedPieceDisplay(Piece piece) {
+        //Insert into the player captured pieces queue and update the GUI
+        String symbol = piece.getPieceSymbol();
+
+        if (piece.getPieceColor() == com.evan.p2pChess.Color.WHITE) {
+            blackCapturedPieces.put(symbol, blackCapturedPieces.getOrDefault(symbol, 0) + 1);
+            blackCapturedPieceArea.setText(formatCapturedPiecesDisplay(blackCapturedPieces));
+            blackPlayer.addPlayerCapturedPiece(symbol);
+        } else {
+            whiteCapturedPieces.put(symbol, whiteCapturedPieces.getOrDefault(symbol, 0) + 1);
+            whiteCapturedPieceArea.setText(formatCapturedPiecesDisplay(whiteCapturedPieces));
+            whitePlayer.addPlayerCapturedPiece(symbol);
+        }
+    }
+
+    private String formatCapturedPiecesDisplay(Map<String, Integer> capturedMap) {
+        StringBuilder sb = new StringBuilder();
+
+        for (Map.Entry<String, Integer> entry : capturedMap.entrySet()) {
+            sb.append(entry.getKey());
+            if (entry.getValue() > 1) sb.append("x").append(entry.getValue());
+            sb.append(" ");
+        }
+
+        return sb.toString().trim();
+    }    
 
     /**
      * assignTileColor()

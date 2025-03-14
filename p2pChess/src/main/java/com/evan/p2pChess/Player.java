@@ -3,17 +3,21 @@ package com.evan.p2pChess;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import com.evan.p2pChess.Pieces.*;
+
 public class Player {
     private String playerName;
     private Integer playerPoints;
     private Color playerColor;
     private Queue<String> playerMoves;
+    private Queue<String> playerCapturedPieces;
 
     public Player() {
         this.playerName = "";
         this.playerPoints = 0;
         this.playerColor = null;
         this.playerMoves = new LinkedList<>();
+        this.playerCapturedPieces = new LinkedList<>();
     }
 
     public Player(String name, Integer points, Color color) {
@@ -21,6 +25,7 @@ public class Player {
         this.playerPoints = points;
         this.playerColor = color;
         this.playerMoves = new LinkedList<>();
+        this.playerCapturedPieces = new LinkedList<>();
     }
 
     //Getters
@@ -41,6 +46,17 @@ public class Player {
      */
     public void addPlayerMove(String move) {
         playerMoves.add(move);
+    }
+
+    /**
+     * addPlayerCapturedPiece()
+     * 
+     * Adds a captured piece into the captured piece queue.
+     * 
+     * @param points
+     */
+    public void addPlayerCapturedPiece(String capturedPieceString) {
+        playerCapturedPieces.add(capturedPieceString);
     }
 
     /**
