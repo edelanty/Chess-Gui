@@ -9,8 +9,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class P2PChess {
     private JPanel chessBoardPanel;
@@ -23,6 +26,10 @@ public class P2PChess {
 
     private int selectedRow;
     private int selectedCol;
+    private Piece rightClickHighlightedPiece;
+    private int rightClickHighlightedRow;
+    private int rightClickHighlightedCol;
+
     private boolean whiteTurn;
     private int moveNumber;
 
@@ -53,6 +60,9 @@ public class P2PChess {
         this.tileButtons = new JButton[Board.BOARD_SIZE][Board.BOARD_SIZE];
         this.selectedRow = -1;
         this.selectedCol = -1;
+        this.rightClickHighlightedPiece = null;
+        this.rightClickHighlightedRow = -1;
+        this.rightClickHighlightedCol = -1;
         this.whiteTurn = true;
         this.moveNumber = 1;
         this.PRIMARY_COLOR = Settings.WHITE_COLOR;
@@ -92,6 +102,7 @@ public class P2PChess {
 
                 updateTileDisplay(row, col);
                 createTileActionListener(tileButton, row, col);
+                createRightClickTileActionListener(tileButton, row, col);
                 assignTileColor(tileButton, row, col);
 
                 tileButton.setFocusable(false);
@@ -199,6 +210,14 @@ public class P2PChess {
     private void handleTileClick(int row, int col) {
         Piece clickedPiece = board.getPieceAt(row, col);
 
+        //Resetting any previous right click code
+        if (rightClickHighlightedPiece != null) {
+            resetHighlightedTiles();
+            rightClickHighlightedPiece = null;
+            rightClickHighlightedRow = -1;
+            rightClickHighlightedCol = -1;
+        }
+
         if (selectedRow == -1 && clickedPiece != null && isCorrectTurn(clickedPiece)) { //Player hasn't clicked anything yet and has just selected a piece
             //Keep track of previous selected tile information to display on the GUI 
             selectedRow = row;
@@ -218,21 +237,43 @@ public class P2PChess {
                 updateMoveListDisplay(selectedPiece, selectedRow, selectedCol, row, col);
                 whiteTurn = !whiteTurn;
             } else {
-                //TODO user feedback for invalid move
+                invalidMoveFeedback(selectedRow, selectedCol);
             }
 
             //Reset for next click
-            JButton tempButton = new JButton();
-            tileButtons[selectedRow][selectedCol].setBorder(tempButton.getBorder()); //Resets to the proper border after moving
-            if ((selectedRow + selectedCol) % 2 == 0) {
-                tileButtons[selectedRow][selectedCol].setBackground(PRIMARY_COLOR);
-            } else {
-                tileButtons[selectedRow][selectedCol].setBackground(ALTERNATIVE_COLOR);
-            }
-
+            resetHighlightedTiles();
             selectedRow = -1;
             selectedCol = -1;
         }
+    }
+
+    private void handleRightTileClick(int row, int col) {
+        Piece clickedPiece = board.getPieceAt(row, col);
+
+        //If we right-click the same piece that was already highlighted, reset highlights
+        if (rightClickHighlightedRow == row && rightClickHighlightedCol == col && rightClickHighlightedPiece == clickedPiece) {
+            resetHighlightedTiles();
+            rightClickHighlightedPiece = null;
+            rightClickHighlightedRow = -1;
+            rightClickHighlightedCol = -1;
+            
+            return;
+        }
+        
+        //Reset previous highlights if any
+        resetHighlightedTiles();
+        
+        //If there's a piece at this location, show its moves
+        if (clickedPiece != null) {
+            //Store the piece we're highlighting
+            rightClickHighlightedPiece = clickedPiece;
+            rightClickHighlightedRow = row;
+            rightClickHighlightedCol = col;
+            
+            //Show possible moves
+            clickedPiece.drawPossiblePieceMoves(this, board);
+        }
+
     }
 
     /**
@@ -297,6 +338,7 @@ public class P2PChess {
     private void updateTileDisplay(int row, int col) {
         Piece piece = board.getPieceAt(row, col);
         JButton button = tileButtons[row][col];
+        button.setRolloverEnabled(false);
 
         //If the board has a piece on it, set that tile to display the proper piece
         if (piece != null) {
@@ -362,7 +404,59 @@ public class P2PChess {
         }
 
         return sb.toString().trim();
-    }    
+    }
+
+    /**
+     * invalidMoveFeedback()
+     * 
+     * Changes the selected pieces tile color to be random.
+     * 
+     * @param row
+     * @param col
+     */
+    private void invalidMoveFeedback(int row, int col) {
+        JButton tileButton = tileButtons[row][col];
+        Random random = new Random();
+
+        //TODO do something
+    }
+
+    /**
+     * moveHighlightTile()
+     * 
+     * Sets a tile to the highlight color.
+     * 
+     * @param row
+     * @param col
+     */
+    public void moveHighlightTile(int row, int col) {
+        JButton tileButton = tileButtons[row][col];
+
+        if (board.getPieceAt(row, col) != null && board.getPieceAt(row, col).getPieceColor() != board.getPieceAt(selectedRow, selectedCol).getPieceColor()) { //Capturable piece highlight
+            tileButton.setBackground(Settings.DARKER_HIGHLIGHT_YELLOW);
+        } else { //Normal highlight
+            tileButton.setBackground(Settings.HIGHLIGHT_YELLOW);
+        }
+
+        chessBoardPanel.repaint();
+    }
+
+    private void resetHighlightedTiles() {
+        JButton tempButton = new JButton();
+
+        for (int row = 0; row < Board.BOARD_SIZE; row++) {
+            for (int col = 0; col < Board.BOARD_SIZE; col++) {
+                if ((row + col) % 2 == 0) {
+                    tileButtons[row][col].setBackground(PRIMARY_COLOR);
+                } else {
+                    tileButtons[row][col].setBackground(ALTERNATIVE_COLOR);
+                }
+
+                tileButtons[row][col].setBorder(tempButton.getBorder()); //Resets to the proper border after moving
+                chessBoardPanel.repaint();
+            }
+        }
+    }
 
     /**
      * assignTileColor()
@@ -410,6 +504,17 @@ public class P2PChess {
             @Override
             public void actionPerformed(ActionEvent e) {
                 handleTileClick(row, col);
+            }
+        });
+    }
+
+    private void createRightClickTileActionListener(JButton button, int row, int col) {
+        button.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON3) {
+                    handleRightTileClick(row, col);
+                }
             }
         });
     }

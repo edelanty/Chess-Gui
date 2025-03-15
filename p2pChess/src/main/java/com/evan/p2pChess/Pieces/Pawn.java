@@ -3,6 +3,7 @@ package com.evan.p2pChess.Pieces;
 import com.evan.p2pChess.Board;
 import com.evan.p2pChess.Color;
 import com.evan.p2pChess.Player;
+import com.evan.p2pChess.Gui.P2PChess;
 
 public class Pawn extends Piece {
     private boolean hasMoved;
@@ -22,6 +23,10 @@ public class Pawn extends Piece {
     //Setters
     public void setHasMoved(boolean hasMoved) {
         this.hasMoved = hasMoved;
+    }
+
+    public void drawPossiblePieceMoves(P2PChess gui, Board board) {
+
     }
 
     @Override

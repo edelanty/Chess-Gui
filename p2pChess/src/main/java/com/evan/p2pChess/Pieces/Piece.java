@@ -3,6 +3,7 @@ package com.evan.p2pChess.Pieces;
 import com.evan.p2pChess.Board;
 import com.evan.p2pChess.Color;
 import com.evan.p2pChess.Player;
+import com.evan.p2pChess.Gui.P2PChess;
 
 /**
  * Piece Class
@@ -59,6 +60,14 @@ public abstract class Piece implements Movement {
     public void setPieceCol(Integer newY) {
         piecePosition[0][1] = newY;
     }
+
+    /**
+     * drawPossiblePieceMoves()
+     * 
+     * Changes the color of tiles on the board where a piece could theoretically move unblocked.
+     * 
+     */
+    public abstract void drawPossiblePieceMoves(P2PChess gui, Board board);
 
     /**
      * getPieceSymbol()

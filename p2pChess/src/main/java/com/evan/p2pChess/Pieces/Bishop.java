@@ -3,11 +3,16 @@ package com.evan.p2pChess.Pieces;
 import com.evan.p2pChess.Board;
 import com.evan.p2pChess.Color;
 import com.evan.p2pChess.Player;
+import com.evan.p2pChess.Gui.P2PChess;
 
 public class Bishop extends Piece {
 
     public Bishop(Integer[][] position, Color color, Player owner) {
         super(position, "Bishop", 3, color, owner);
+    }
+
+    public void drawPossiblePieceMoves(P2PChess gui, Board board) {
+        
     }
 
     @Override

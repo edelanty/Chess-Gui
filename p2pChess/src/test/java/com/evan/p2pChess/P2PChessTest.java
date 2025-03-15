@@ -299,4 +299,128 @@ public class P2PChessTest {
         assertEquals(expectedCol, board.getPieceAt(expectedRow, expectedCol).getPieceCol());
     }
 
+    @Test
+    public void whiteKnightB1toC3MoveTest() {
+        Player white = new Player("white", 0, Color.WHITE);
+        Knight b1Knight = new Knight(new Integer[][]{{Board.WHITE_BACK_ROW, Board.COL_B}}, Color.WHITE, white);
+        Board board = new Board(white, new Player("black", 0, Color.BLACK));
+        Integer expectedRow = Board.ROW_3, expectedCol = Board.COL_C;
+        //Putting knight on the board
+        board.setPieceAt(b1Knight.getPieceRow(), b1Knight.getPieceCol(), b1Knight);
+        b1Knight.move(expectedRow, expectedCol, board);
+        assertEquals(b1Knight, board.getPieceAt(expectedRow, expectedCol));
+        assertEquals(null, board.getPieceAt(Board.WHITE_BACK_ROW, Board.COL_B));
+        assertEquals(expectedRow, board.getPieceAt(expectedRow, expectedCol).getPieceRow());
+        assertEquals(expectedCol, board.getPieceAt(expectedRow, expectedCol).getPieceCol());
+    }
+
+    @Test
+    public void whiteKnightG1toF3MoveTest() {
+        Player white = new Player("white", 0, Color.WHITE);
+        Knight g1Knight = new Knight(new Integer[][]{{Board.WHITE_BACK_ROW, Board.COL_G}}, Color.WHITE, white);
+        Board board = new Board(white, new Player("black", 0, Color.BLACK));
+        Integer expectedRow = Board.ROW_3, expectedCol = Board.COL_F;
+        //Putting knight on the board
+        board.setPieceAt(g1Knight.getPieceRow(), g1Knight.getPieceCol(), g1Knight);
+        g1Knight.move(expectedRow, expectedCol, board);
+        assertEquals(g1Knight, board.getPieceAt(expectedRow, expectedCol));
+        assertEquals(null, board.getPieceAt(Board.WHITE_BACK_ROW, Board.COL_G));
+        assertEquals(expectedRow, board.getPieceAt(expectedRow, expectedCol).getPieceRow());
+        assertEquals(expectedCol, board.getPieceAt(expectedRow, expectedCol).getPieceCol());
+    }
+
+    @Test
+    public void blackKnightB8toA6MoveTest() {
+        Player black = new Player("black", 0, Color.BLACK);
+        Knight b8Knight = new Knight(new Integer[][]{{Board.BLACK_BACK_ROW, Board.COL_B}}, Color.BLACK, black);
+        Board board = new Board(new Player("white", 0, Color.WHITE), black);
+        Integer expectedRow = Board.ROW_6, expectedCol = Board.COL_A;
+        //Putting knight on the board
+        board.setPieceAt(b8Knight.getPieceRow(), b8Knight.getPieceCol(), b8Knight);
+        b8Knight.move(expectedRow, expectedCol, board);
+        assertEquals(b8Knight, board.getPieceAt(expectedRow, expectedCol));
+        assertEquals(null, board.getPieceAt(Board.BLACK_BACK_ROW, Board.COL_B));
+        assertEquals(expectedRow, board.getPieceAt(expectedRow, expectedCol).getPieceRow());
+        assertEquals(expectedCol, board.getPieceAt(expectedRow, expectedCol).getPieceCol());
+    }
+
+    @Test
+    public void whiteKnightB1toInvalidMovesTest() {
+        Player white = new Player("white", 0, Color.WHITE);
+        Knight b1Knight = new Knight(new Integer[][]{{Board.WHITE_BACK_ROW, Board.COL_B}}, Color.WHITE, white);
+        Board board = new Board(white, new Player("black", 0, Color.BLACK));
+        Integer expectedRow = Board.WHITE_BACK_ROW, expectedCol = Board.COL_B;
+        //Putting knight on the board
+        board.setPieceAt(b1Knight.getPieceRow(), b1Knight.getPieceCol(), b1Knight);
+        //Try to move straight up (not an L-shape)
+        b1Knight.move(Board.ROW_2, Board.COL_B, board);
+        assertEquals(b1Knight, board.getPieceAt(expectedRow, expectedCol));
+        //Try to move diagonally (not an L-shape)
+        b1Knight.move(Board.ROW_2, Board.COL_C, board);
+        assertEquals(b1Knight, board.getPieceAt(expectedRow, expectedCol));
+        assertEquals(expectedRow, board.getPieceAt(expectedRow, expectedCol).getPieceRow());
+        assertEquals(expectedCol, board.getPieceAt(expectedRow, expectedCol).getPieceCol());
+    }
+
+    @Test
+    public void blackKnightJumpingOverPiecesTest() {
+        Player black = new Player("black", 0, Color.BLACK);
+        Player white = new Player("white", 0, Color.WHITE);
+        Knight g8Knight = new Knight(new Integer[][]{{Board.BLACK_BACK_ROW, Board.COL_G}}, Color.BLACK, black);
+        //Place some pieces that would block other pieces but not a knight
+        Pawn f7Pawn = new Pawn(new Integer[][]{{Board.BLACK_PAWN_ROW, Board.COL_F}}, Color.BLACK, black);
+        Pawn g7Pawn = new Pawn(new Integer[][]{{Board.BLACK_PAWN_ROW, Board.COL_G}}, Color.BLACK, black);
+        Pawn h7Pawn = new Pawn(new Integer[][]{{Board.BLACK_PAWN_ROW, Board.COL_H}}, Color.BLACK, black);
+        Board board = new Board(white, black);
+        Integer expectedRow = Board.ROW_6, expectedCol = Board.COL_H;
+        //Putting pieces on the board
+        board.setPieceAt(g8Knight.getPieceRow(), g8Knight.getPieceCol(), g8Knight);
+        board.setPieceAt(f7Pawn.getPieceRow(), f7Pawn.getPieceCol(), f7Pawn);
+        board.setPieceAt(g7Pawn.getPieceRow(), g7Pawn.getPieceCol(), g7Pawn);
+        board.setPieceAt(h7Pawn.getPieceRow(), h7Pawn.getPieceCol(), h7Pawn);
+        //Knight should be able to jump over the pawns
+        g8Knight.move(expectedRow, expectedCol, board);
+        assertEquals(g8Knight, board.getPieceAt(expectedRow, expectedCol));
+        assertEquals(null, board.getPieceAt(Board.BLACK_BACK_ROW, Board.COL_G));
+        assertEquals(expectedRow, board.getPieceAt(expectedRow, expectedCol).getPieceRow());
+        assertEquals(expectedCol, board.getPieceAt(expectedRow, expectedCol).getPieceCol());
+    }
+
+    @Test
+    public void whiteKnightCaptureTest() {
+        Player white = new Player("white", 0, Color.WHITE);
+        Player black = new Player("black", 0, Color.BLACK);
+        Knight b1Knight = new Knight(new Integer[][]{{Board.WHITE_BACK_ROW, Board.COL_B}}, Color.WHITE, white);
+        Pawn c3Pawn = new Pawn(new Integer[][]{{Board.ROW_3, Board.COL_C}}, Color.BLACK, black);
+        Board board = new Board(white, black);
+        Integer expectedRow = Board.ROW_3, expectedCol = Board.COL_C;
+        //Putting pieces on the board
+        board.setPieceAt(b1Knight.getPieceRow(), b1Knight.getPieceCol(), b1Knight);
+        board.setPieceAt(c3Pawn.getPieceRow(), c3Pawn.getPieceCol(), c3Pawn);
+        //Knight should be able to capture the opponent's pawn
+        b1Knight.move(expectedRow, expectedCol, board);
+        assertEquals(b1Knight, board.getPieceAt(expectedRow, expectedCol));
+        assertEquals(null, board.getPieceAt(Board.WHITE_BACK_ROW, Board.COL_B));
+        assertEquals(expectedRow, board.getPieceAt(expectedRow, expectedCol).getPieceRow());
+        assertEquals(expectedCol, board.getPieceAt(expectedRow, expectedCol).getPieceCol());
+    }
+
+    @Test
+    public void whiteKnightBlockedBySameColorTest() {
+        Player white = new Player("white", 0, Color.WHITE);
+        Knight b1Knight = new Knight(new Integer[][]{{Board.WHITE_BACK_ROW, Board.COL_B}}, Color.WHITE, white);
+        Pawn c3Pawn = new Pawn(new Integer[][]{{Board.ROW_3, Board.COL_C}}, Color.WHITE, white);
+        Board board = new Board(white, new Player("black", 0, Color.BLACK));
+        Integer expectedRow = Board.WHITE_BACK_ROW, expectedCol = Board.COL_B;
+        //Putting pieces on the board
+        board.setPieceAt(b1Knight.getPieceRow(), b1Knight.getPieceCol(), b1Knight);
+        board.setPieceAt(c3Pawn.getPieceRow(), c3Pawn.getPieceCol(), c3Pawn);
+        //Knight should not be able to move to a square occupied by a piece of the same color
+        b1Knight.move(Board.ROW_3, Board.COL_C, board);
+        assertEquals(b1Knight, board.getPieceAt(expectedRow, expectedCol));
+        assertEquals(c3Pawn, board.getPieceAt(Board.ROW_3, Board.COL_C));
+        assertEquals(expectedRow, board.getPieceAt(expectedRow, expectedCol).getPieceRow());
+        assertEquals(expectedCol, board.getPieceAt(expectedRow, expectedCol).getPieceCol());
+    }
+
 }
