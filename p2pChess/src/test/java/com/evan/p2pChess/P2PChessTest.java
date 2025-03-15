@@ -160,6 +160,7 @@ public class P2PChessTest {
     }
 
     //Rook movement tests
+
     @Test
     public void whiteRookA1toA4MoveTest() {
         Player white = new Player("white", 0, Color.WHITE);
@@ -202,6 +203,98 @@ public class P2PChessTest {
         h8Rook.move(expectedRow, expectedCol, board);
         assertEquals(h8Rook, board.getPieceAt(expectedRow, expectedCol));
         assertEquals(null, board.getPieceAt(Board.BLACK_BACK_ROW, Board.COL_H));
+        assertEquals(expectedRow, board.getPieceAt(expectedRow, expectedCol).getPieceRow());
+        assertEquals(expectedCol, board.getPieceAt(expectedRow, expectedCol).getPieceCol());
+    }
+
+    @Test
+    public void whiteQueenD1toD4MoveTest() {
+        Player white = new Player("white", 0, Color.WHITE);
+        Queen d1Queen = new Queen(new Integer[][]{{Board.WHITE_BACK_ROW, Board.COL_D}}, Color.WHITE, white);
+        Board board = new Board(white, new Player("black", 0, Color.BLACK));
+        Integer expectedRow = Board.ROW_4, expectedCol = Board.COL_D;
+        //Putting queen on the board
+        board.setPieceAt(d1Queen.getPieceRow(), d1Queen.getPieceCol(), d1Queen);
+        d1Queen.move(expectedRow, expectedCol, board);
+        assertEquals(d1Queen, board.getPieceAt(expectedRow, expectedCol));
+        assertEquals(null, board.getPieceAt(Board.WHITE_BACK_ROW, Board.COL_D));
+        assertEquals(expectedRow, board.getPieceAt(expectedRow, expectedCol).getPieceRow());
+        assertEquals(expectedCol, board.getPieceAt(expectedRow, expectedCol).getPieceCol());
+    }
+
+    @Test
+    public void whiteQueenD1toD4BlockedMoveTest() {
+        Player white = new Player("white", 0, Color.WHITE);
+        Pawn d2Pawn = new Pawn(new Integer[][]{{Board.WHITE_PAWN_ROW, Board.COL_D}}, Color.WHITE, white);
+        Queen d1Queen = new Queen(new Integer[][]{{Board.WHITE_BACK_ROW, Board.COL_D}}, Color.WHITE, white);
+        Board board = new Board(white, new Player("black", 0, Color.BLACK));
+        Integer expectedRow = Board.WHITE_BACK_ROW, expectedCol = Board.COL_D;
+        //Putting queen and pawn on the board
+        board.setPieceAt(d2Pawn.getPieceRow(), d2Pawn.getPieceCol(), d2Pawn);
+        board.setPieceAt(d1Queen.getPieceRow(), d1Queen.getPieceCol(), d1Queen);
+        d1Queen.move(Board.ROW_4, Board.COL_D, board);
+        assertEquals(d1Queen, board.getPieceAt(expectedRow, expectedCol));
+        assertEquals(expectedRow, board.getPieceAt(expectedRow, expectedCol).getPieceRow());
+        assertEquals(expectedCol, board.getPieceAt(expectedRow, expectedCol).getPieceCol());
+    }
+
+    @Test
+    public void blackQueenD8toD5MoveTest() {
+        Player black = new Player("black", 0, Color.BLACK);
+        Queen d8Queen = new Queen(new Integer[][]{{Board.BLACK_BACK_ROW, Board.COL_D}}, Color.BLACK, black);
+        Board board = new Board(new Player("white", 0, Color.WHITE), black);
+        Integer expectedRow = Board.ROW_5, expectedCol = Board.COL_D;
+        //Putting queen on the board
+        board.setPieceAt(d8Queen.getPieceRow(), d8Queen.getPieceCol(), d8Queen);
+        d8Queen.move(expectedRow, expectedCol, board);
+        assertEquals(d8Queen, board.getPieceAt(expectedRow, expectedCol));
+        assertEquals(null, board.getPieceAt(Board.BLACK_BACK_ROW, Board.COL_D));
+        assertEquals(expectedRow, board.getPieceAt(expectedRow, expectedCol).getPieceRow());
+        assertEquals(expectedCol, board.getPieceAt(expectedRow, expectedCol).getPieceCol());
+    }
+
+    @Test
+    public void whiteQueenD1toG4DiagonalMoveTest() {
+        Player white = new Player("white", 0, Color.WHITE);
+        Queen d1Queen = new Queen(new Integer[][]{{Board.WHITE_BACK_ROW, Board.COL_D}}, Color.WHITE, white);
+        Board board = new Board(white, new Player("black", 0, Color.BLACK));
+        Integer expectedRow = Board.ROW_4, expectedCol = Board.COL_G;
+        //Putting queen on the board
+        board.setPieceAt(d1Queen.getPieceRow(), d1Queen.getPieceCol(), d1Queen);
+        d1Queen.move(expectedRow, expectedCol, board);
+        assertEquals(d1Queen, board.getPieceAt(expectedRow, expectedCol));
+        assertEquals(null, board.getPieceAt(Board.WHITE_BACK_ROW, Board.COL_D));
+        assertEquals(expectedRow, board.getPieceAt(expectedRow, expectedCol).getPieceRow());
+        assertEquals(expectedCol, board.getPieceAt(expectedRow, expectedCol).getPieceCol());
+    }
+
+    @Test
+    public void blackQueenD8toA5DiagonalMoveTest() {
+        Player black = new Player("black", 0, Color.BLACK);
+        Queen d8Queen = new Queen(new Integer[][]{{Board.BLACK_BACK_ROW, Board.COL_D}}, Color.BLACK, black);
+        Board board = new Board(new Player("white", 0, Color.WHITE), black);
+        Integer expectedRow = Board.ROW_5, expectedCol = Board.COL_A;
+        //Putting queen on the board
+        board.setPieceAt(d8Queen.getPieceRow(), d8Queen.getPieceCol(), d8Queen);
+        d8Queen.move(expectedRow, expectedCol, board);
+        assertEquals(d8Queen, board.getPieceAt(expectedRow, expectedCol));
+        assertEquals(null, board.getPieceAt(Board.BLACK_BACK_ROW, Board.COL_D));
+        assertEquals(expectedRow, board.getPieceAt(expectedRow, expectedCol).getPieceRow());
+        assertEquals(expectedCol, board.getPieceAt(expectedRow, expectedCol).getPieceCol());
+    }
+
+    @Test
+    public void whiteQueenD1toG4DiagonalBlockedMoveTest() {
+        Player white = new Player("white", 0, Color.WHITE);
+        Pawn f3Pawn = new Pawn(new Integer[][]{{Board.ROW_3, Board.COL_F}}, Color.WHITE, white);
+        Queen d1Queen = new Queen(new Integer[][]{{Board.WHITE_BACK_ROW, Board.COL_D}}, Color.WHITE, white);
+        Board board = new Board(white, new Player("black", 0, Color.BLACK));
+        Integer expectedRow = Board.WHITE_BACK_ROW, expectedCol = Board.COL_D;
+        //Putting queen and pawn on the board
+        board.setPieceAt(f3Pawn.getPieceRow(), f3Pawn.getPieceCol(), f3Pawn);
+        board.setPieceAt(d1Queen.getPieceRow(), d1Queen.getPieceCol(), d1Queen);
+        d1Queen.move(Board.ROW_4, Board.COL_G, board);
+        assertEquals(d1Queen, board.getPieceAt(expectedRow, expectedCol));
         assertEquals(expectedRow, board.getPieceAt(expectedRow, expectedCol).getPieceRow());
         assertEquals(expectedCol, board.getPieceAt(expectedRow, expectedCol).getPieceCol());
     }

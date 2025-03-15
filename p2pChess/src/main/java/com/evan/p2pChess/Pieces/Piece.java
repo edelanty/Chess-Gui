@@ -133,7 +133,7 @@ public abstract class Piece implements Movement {
         Integer direction = 0, tempRow = 0, tempCol = 0;
 
         if (curRow == newRow) { //If moving horizontally across columns
-            direction = (newCol > curRow) ? 1 : -1;
+            direction = (newCol > curCol) ? 1 : -1;
             tempCol = curCol + direction;
 
             while (tempCol != newCol) { //While we haven't reached the destination tile

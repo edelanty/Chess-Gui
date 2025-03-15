@@ -11,12 +11,7 @@ public class Pawn extends Piece {
     public Pawn(Integer[][] position, Color color, Player owner) {
         super(position, "Pawn", 1, color, owner);
         this.hasMoved = false;
-        
-        if (color == Color.WHITE) {
-            this.direction = -1; //White moves up
-        } else {
-            this.direction = 1; //Black moves down
-        }
+        this.direction = (color == Color.WHITE) ? -1 : 1;
     }
 
     //Getters
