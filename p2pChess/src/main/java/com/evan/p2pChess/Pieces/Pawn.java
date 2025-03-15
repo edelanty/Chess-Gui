@@ -26,6 +26,45 @@ public class Pawn extends Piece {
     }
 
     public void drawPossiblePieceMoves(P2PChess gui, Board board) {
+        Integer curRow = this.getPieceRow();
+        Integer curCol = this.getPieceCol();
+        Integer newRow = curRow + direction;
+        Integer newCol = null;
+
+        //Single move or double move upwards highlighting
+        if (newRow >= 0 && newRow < Board.BOARD_SIZE) {
+            if (isValidMove(newRow, curCol, board)) {
+                gui.moveHighlightTile(pieceColor, newRow, curCol);
+
+                if (!hasMoved) {
+                    newRow = curRow + (2 * direction);
+
+                    if (newRow >= 0 && newRow < Board.BOARD_SIZE) {
+                        if (isValidMove(newRow, curCol, board)) {
+                            gui.moveHighlightTile(pieceColor, newRow, curCol);
+                        }
+                    }
+                }
+            }
+        }
+
+        //Diagonal capture highlighting
+        int[] captureColOffsets = {-1, 1};
+
+        for (int colOffset : captureColOffsets) {
+            newRow = curRow + direction;
+            newCol = curCol + colOffset;
+
+            if (newRow >= 0 && newRow < Board.BOARD_SIZE && newCol >= 0 && newCol < Board.BOARD_SIZE) {
+                Piece target = board.getPieceAt(newRow, newCol);
+
+                if (target != null && target.getPieceColor() != pieceColor) { //If there's a piece and it's the opposing color
+                    gui.moveHighlightTile(pieceColor, newRow, newCol);
+                }
+            }
+
+            //Add en passant highlighting TODO
+        }
 
     }
 

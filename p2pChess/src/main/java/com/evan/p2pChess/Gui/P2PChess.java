@@ -13,7 +13,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 public class P2PChess {
     private JPanel chessBoardPanel;
@@ -191,7 +190,7 @@ public class P2PChess {
         whiteScore.setFocusable(false);
         whiteScore.setBorder(null);
         whiteScore.setEditable(false);
-        whiteScore.setText("Score: " + blackPlayer.getPlayerPoints().toString());
+        whiteScore.setText("Score: " + whitePlayer.getPlayerPoints().toString());
 
         whiteCapturedPanel.add(whiteScore);
         whiteCapturedPanel.add(whiteCapturedPieceArea);
@@ -409,16 +408,30 @@ public class P2PChess {
     /**
      * invalidMoveFeedback()
      * 
-     * Changes the selected pieces tile color to be random.
+     * Shakes the tile in which the move was invalid for.
      * 
      * @param row
      * @param col
      */
     private void invalidMoveFeedback(int row, int col) {
         JButton tileButton = tileButtons[row][col];
-        Random random = new Random();
+        Point originalLocation = tileButton.getLocation();
 
-        //TODO do something
+        Timer timer = new Timer(10, null);
+        final int[] count = {0};
+
+        timer.addActionListener(e -> {
+            int dx = (count[0] % 2 == 0) ? 5 : -5;
+            tileButton.setLocation(originalLocation.x + dx, originalLocation.y);
+            count[0]++;
+
+            if (count[0] >= 6) {
+                timer.stop();
+                tileButton.setLocation(originalLocation);
+            }
+        });
+
+        timer.start();
     }
 
     /**
@@ -429,10 +442,11 @@ public class P2PChess {
      * @param row
      * @param col
      */
-    public void moveHighlightTile(int row, int col) {
+    public void moveHighlightTile(com.evan.p2pChess.Color currentPieceColor, int row, int col) {
         JButton tileButton = tileButtons[row][col];
+        Piece piece = board.getPieceAt(row, col);
 
-        if (board.getPieceAt(row, col) != null && board.getPieceAt(row, col).getPieceColor() != board.getPieceAt(selectedRow, selectedCol).getPieceColor()) { //Capturable piece highlight
+        if (piece != null && currentPieceColor != piece.getPieceColor()) {
             tileButton.setBackground(Settings.DARKER_HIGHLIGHT_YELLOW);
         } else { //Normal highlight
             tileButton.setBackground(Settings.HIGHLIGHT_YELLOW);

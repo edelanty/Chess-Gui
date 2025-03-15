@@ -26,19 +26,23 @@ public class Knight extends Piece {
             int newRow = curRow + move[0];
             int newCol = curCol + move[1];
 
-            if (newRow >= 0 && newRow < Board.BOARD_SIZE && newCol >= 0 && newCol < Board.BOARD_SIZE && isValidMove(newRow, newCol, board)) {
-                gui.moveHighlightTile(newRow, newCol);
+            if (newRow >= 0 && newRow < Board.BOARD_SIZE && newCol >= 0 && newCol < Board.BOARD_SIZE) { //If the indices are in the bounds of our array
+                if (isValidMove(newRow, newCol, board)) { //Check for a valid move at the possible new positions
+                    gui.moveHighlightTile(this.getPieceColor(), newRow, newCol); //Highlight the pieces that are valid at the position
+                }
             }
         }
     }
 
     @Override
     public boolean isValidMove(Integer newRow, Integer newCol, Board board) {
-        Piece target = board.getPieceAt(newRow, newCol);
+        Piece target = null;
         Integer curRow = this.getPieceRow();
         Integer curCol = this.getPieceCol();
         Integer rowDiff = 0, colDiff = 0;
         boolean isLShape = false;
+
+        target = board.getPieceAt(newRow, newCol);
 
         rowDiff = Math.abs(newRow - curRow);
         colDiff = Math.abs(newCol - curCol);

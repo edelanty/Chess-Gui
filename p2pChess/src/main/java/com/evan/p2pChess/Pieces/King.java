@@ -6,9 +6,11 @@ import com.evan.p2pChess.Player;
 import com.evan.p2pChess.Gui.P2PChess;
 
 public class King extends Piece {
+    private boolean isChecked;
 
     public King(Integer[][] position, Color color, Player owner) {
         super(position, "King", 0, color, owner);
+        this.isChecked = false;
     }
 
     public void drawPossiblePieceMoves(P2PChess gui, Board board) {
