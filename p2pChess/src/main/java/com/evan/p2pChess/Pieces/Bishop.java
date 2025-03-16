@@ -12,7 +12,38 @@ public class Bishop extends Piece {
     }
 
     public void drawPossiblePieceMoves(P2PChess gui, Board board) {
+        Integer curRow = this.getPieceRow();
+        Integer curCol = this.getPieceCol();
         
+        //Define the diagonal directions a bishop can move
+        int[][] diagonalDirections = {
+            {-1, -1}, {-1, 1}, {1, -1}, {1, 1}
+        };
+        
+        //Check all possible positions in each direction
+        for (int[] dir : diagonalDirections) {
+            int rowDir = dir[0];
+            int colDir = dir[1];
+            
+            //A bishop can move any number of squares diagonally (until edge or blocked)
+            for (int distance = 1; distance < Board.BOARD_SIZE; distance++) {
+                int newRow = curRow + (rowDir * distance);
+                int newCol = curCol + (colDir * distance);
+                
+                if (newRow >= 0 && newRow < Board.BOARD_SIZE && newCol >= 0 && newCol < Board.BOARD_SIZE) {
+                    if (isValidMove(newRow, newCol, board)) {
+                        gui.moveHighlightTile(pieceColor, newRow, newCol);
+                    }
+                    
+                    //If there's a piece at this position, we can't move further in this direction
+                    if (board.getPieceAt(newRow, newCol) != null) {
+                        break;
+                    }
+                } else {                    
+                    break; //Position is off the board, stop checking in this direction
+                }
+            }
+        }
     }
 
     @Override

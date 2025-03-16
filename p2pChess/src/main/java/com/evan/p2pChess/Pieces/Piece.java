@@ -67,7 +67,7 @@ public abstract class Piece implements Movement {
      * Changes the color of tiles on the board where a piece could theoretically move unblocked.
      * 
      */
-    public abstract void drawPossiblePieceMoves(P2PChess gui, Board board);
+    public abstract void drawPossiblePieceMoves(P2PChess gui, Board board); 
 
     /**
      * getPieceSymbol()
@@ -112,6 +112,10 @@ public abstract class Piece implements Movement {
         Integer tempCol = curCol + colDirection;
 
         while (tempRow != newRow && tempCol != newCol) { //While we haven't reached the destination
+            if (tempRow < 0 || tempRow >= Board.BOARD_SIZE || tempCol < 0 || tempCol >= Board.BOARD_SIZE) {
+                return false; //Early exit if invalid direction
+            }
+
             if (board.getPieceAt(tempRow, tempCol) != null) { //Check for blockage set false and break if so
                 isDiagonalPathClear = false;
 
