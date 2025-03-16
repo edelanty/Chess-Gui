@@ -3,7 +3,6 @@ package com.evan.p2pChess.Gui;
 import com.evan.p2pChess.Board;
 import com.evan.p2pChess.Pieces.*;
 import com.evan.p2pChess.Player;
-import com.evan.p2pChess.Settings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -82,6 +81,7 @@ public class P2PChess {
         chessBoardPanel.add(createMoveHistoryPanel(), BorderLayout.EAST);
         chessBoardPanel.add(createBlackCapturedPiecePanel(), BorderLayout.NORTH);
         chessBoardPanel.add(createWhiteCapturedPiecePanel(), BorderLayout.SOUTH);
+        chessBoardPanel.add(createSidePanel(), BorderLayout.WEST);
     }
 
     /**
@@ -198,6 +198,56 @@ public class P2PChess {
         return whiteCapturedPanel;
     }
 
+    private JPanel createSidePanel() {
+        //Create the side panel with a white background to match the rest of UI
+        JPanel sidePanel = new JPanel();
+        sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.Y_AXIS));
+        sidePanel.setSize(new Dimension(500, 500));
+        sidePanel.setBorder(BorderFactory.createEmptyBorder(15, 5, 5, 5));
+        sidePanel.setPreferredSize(new Dimension(140, 0));
+        
+        //Create the buttons using the same styling approach as the main application
+        JButton settingsButton = createSidePanelButton("Settings");
+        JButton resignButton = createSidePanelButton("Back");
+        JButton exitButton = createSidePanelButton("Resign");
+        
+        //Add icons to buttons with appropriate sizing
+        settingsButton.setFont(new Font("Serif", Font.BOLD, 24));
+        resignButton.setFont(new Font("Serif", Font.BOLD, 24));
+        exitButton.setFont(new Font("Serif", Font.BOLD, 24));
+
+        //Create action listeners
+        createExitButtonActionListener(exitButton);
+        createSettingsButtonActionListener(settingsButton);
+        createResignButtonActionListener(resignButton);
+        
+        //Position buttons at the top with appropriate spacing
+        sidePanel.add(settingsButton);
+        sidePanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        sidePanel.add(resignButton);
+        sidePanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        sidePanel.add(exitButton);
+        
+        //Add glue at the bottom to push everything to the top
+        sidePanel.add(Box.createVerticalGlue());
+        
+        return sidePanel;
+    }
+    
+    // Helper method to create consistently styled buttons for the side panel
+    private JButton createSidePanelButton(String text) {
+        JButton button = new JButton(text);
+        button.setForeground(Color.BLACK);
+        button.setFocusPainted(false);
+        button.setBorderPainted(true);
+        button.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 1));
+        button.setPreferredSize(new Dimension(60, 60));
+        button.setMaximumSize(new Dimension(500, 500));
+        button.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        return button;
+    }
+
     /**
      * handleTileClick()
      * 
@@ -231,6 +281,7 @@ public class P2PChess {
 
             if (selectedPiece != null && selectedPiece.isValidMove(row, col, board)) { //Executed after successful move
                 checkForCapture(destinationPiece, selectedPiece);
+                board.playPieceMovingSound();
                 selectedPiece.move(row, col, board);
                 refreshBoardDisplay();
                 updateMoveListDisplay(selectedPiece, selectedRow, selectedCol, row, col);
@@ -341,9 +392,10 @@ public class P2PChess {
 
         //If the board has a piece on it, set that tile to display the proper piece
         if (piece != null) {
-            button.setText(piece.getPieceSymbol());
+            button.setIcon(piece.getPieceImageIcon());
             button.setFont(new Font("Serif", Font.PLAIN, PIECE_SIZE));
         } else {
+            button.setIcon(null);
             button.setText("");
         }
     }
@@ -504,15 +556,6 @@ public class P2PChess {
         return file + String.valueOf(rank);
     }
 
-    /**
-     * createTileActionListener()
-     * 
-     * Creates an action listener for each clicked button in the GUI and calls handleTileClick for each one.
-     * 
-     * @param button
-     * @param row
-     * @param col
-     */
     private void createTileActionListener(JButton button, int row, int col) {
         button.addActionListener(new ActionListener() {
             @Override
@@ -529,6 +572,33 @@ public class P2PChess {
                 if (e.getButton() == MouseEvent.BUTTON3) {
                     handleRightTileClick(row, col);
                 }
+            }
+        });
+    }
+
+    private void createExitButtonActionListener(JButton button) {
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //TODO
+            }
+        });
+    }
+
+    private void createSettingsButtonActionListener(JButton button) {
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //TODO
+            }
+        });
+    }
+
+    private void createResignButtonActionListener(JButton button) {
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //TODO
             }
         });
     }

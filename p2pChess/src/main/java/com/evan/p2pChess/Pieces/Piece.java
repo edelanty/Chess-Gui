@@ -1,5 +1,11 @@
 package com.evan.p2pChess.Pieces;
 
+import java.awt.Image;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.swing.ImageIcon;
+
 import com.evan.p2pChess.Board;
 import com.evan.p2pChess.Color;
 import com.evan.p2pChess.Player;
@@ -18,6 +24,7 @@ public abstract class Piece implements Movement {
     protected Integer pieceValue;
     protected Color pieceColor;
     protected Player pieceOwner;
+    protected final Map<String, ImageIcon> pieceImageCache = new HashMap<>();
 
     public Piece(Integer[][] position, String name, Integer value, Color color, Player owner) {
         this.piecePosition = position;
@@ -89,6 +96,26 @@ public abstract class Piece implements Movement {
         }
 
         return symbol;
+    }
+
+    private String getPieceImageKey() {
+        String color = this.getPieceColor() == Color.WHITE ? "white" : "black";
+        String name = this.getPieceName().toLowerCase();
+        
+        return color + "-" + name;
+    }
+
+    public ImageIcon getPieceImageIcon() {
+        String key = this.getPieceImageKey();
+
+        if (!pieceImageCache.containsKey(key)) {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/com/evan/p2pChess/Gui/Images/Pieces/" + key + ".png"));
+            Image scaled = icon.getImage().getScaledInstance(48, 48, Image.SCALE_SMOOTH);
+            icon = new ImageIcon(scaled);
+            pieceImageCache.put(key, icon);
+        }
+
+        return pieceImageCache.get(key);    
     }
 
     /**

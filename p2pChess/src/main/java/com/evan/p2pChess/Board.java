@@ -134,6 +134,16 @@ public class Board {
         } else {
             whitePlayer.addPoints(captured.getPieceValue());
         }
+
+        playPieceCaptureSound();
     }
+
+    public void playPieceMovingSound() {
+        SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/move.wav"));
+    }
+
+    public void playPieceCaptureSound() {
+        SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/capture.wav"));
+    } 
 
 }

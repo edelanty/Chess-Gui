@@ -2,11 +2,13 @@ package com.evan.p2pChess.Gui;
 
 import javax.swing.*;
 
-import com.evan.p2pChess.Settings;
+import com.evan.p2pChess.SoundManager;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
  * StartScreen Class
@@ -29,7 +31,7 @@ public class StartScreen {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                ImageIcon background = new ImageIcon(getClass().getResource("Images/start_screen.jpg"));
+                ImageIcon background = new ImageIcon(getClass().getResource("Images/Start Screen/start_screen.jpg"));
                 if (background.getImage() != null) {
                     g.drawImage(background.getImage(), 0, 0, getWidth(), getHeight(), this);
                 } else {
@@ -118,21 +120,46 @@ public class StartScreen {
         playVsAIButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/select.wav"));
                 cardLayout.show(mainPanel, "P2P Chess AI");
             }
         });
 
+        setupMouseListeners(playVsAIButton);
+
         playVsHumanButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/select.wav"));
                 cardLayout.show(mainPanel, "P2P Chess");
             }
         });
 
+        setupMouseListeners(playVsHumanButton);
+
         settingsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/select.wav"));
                 cardLayout.show(mainPanel, "Settings");
+            }
+        });
+
+        setupMouseListeners(settingsButton);
+    }
+
+    private void setupMouseListeners(JButton button) {
+        button.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/hover.wav"));
+                button.setBackground(Settings.SELECTED_COLOR);
+                startScreenPanel.repaint();
+            }
+
+            @Override 
+            public void mouseExited(MouseEvent e) {
+                button.setBackground(Settings.WHITE_COLOR);
             }
         });
     }

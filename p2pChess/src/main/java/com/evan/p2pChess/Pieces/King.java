@@ -160,7 +160,7 @@ public class King extends Piece {
             }
         }
 
-        if (isMoveCastle(newRow, newCol)) {
+        if (isMoveCastle(newRow, newCol)) { //Makes castleing possible
             return canCastle(newRow, newCol, board);
         }
 
