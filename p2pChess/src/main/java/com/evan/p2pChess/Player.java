@@ -3,8 +3,6 @@ package com.evan.p2pChess;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import com.evan.p2pChess.Pieces.*;
-
 public class Player {
     private String playerName;
     private Integer playerPoints;

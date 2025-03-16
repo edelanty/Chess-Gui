@@ -30,6 +30,10 @@ public class King extends Piece {
         Integer curRow = newRow;
         Integer curCol = newCol;
 
+        if (newRow == curRow && newCol == curCol) { //Cannot move king onto same tile
+            return false;
+        }
+
         for (int row = 0; row < Board.BOARD_SIZE; row++) {
             for (int col = 0; col < Board.BOARD_SIZE; col++) {
                 Piece attacker = board.getPieceAt(row, col);
@@ -144,6 +148,10 @@ public class King extends Piece {
         int rowDiff = Math.abs(newRow - curRow);
         int colDiff = Math.abs(newCol - curCol);
 
+        if (isKingInCheck(newRow, newCol, board)) { //Cannot move king into a checked tile
+            return false;
+        }
+
         if ((rowDiff <= 1 && colDiff <= 1) && (rowDiff + colDiff != 0)) {
             Piece target = board.getPieceAt(newRow, newCol);
 
@@ -164,7 +172,7 @@ public class King extends Piece {
         Integer curRow = this.getPieceRow();
         Integer curCol = this.getPieceCol();
         
-        if (isMoveCastle(newRow, newCol) && canCastle(newRow, newCol, board)) {
+        if (isMoveCastle(newRow, newCol) && canCastle(newRow, newCol, board)) { //Castle behavior
             //Remove old position from board
             board.setPieceAt(curRow, curCol, null);
 
