@@ -17,6 +17,7 @@ public class P2PChess {
     private JPanel chessBoardPanel;
     private JPanel mainPanel;
     private CardLayout cardLayout;
+    private Settings settings;
     private JButton[][] tileButtons;
     private Board board;
     private Player whitePlayer;
@@ -31,9 +32,6 @@ public class P2PChess {
     private boolean whiteTurn;
     private int moveNumber;
 
-    private Color PRIMARY_COLOR;
-    private Color ALTERNATIVE_COLOR;
-
     private JTextArea whiteMovesArea;
     private JTextArea blackMovesArea;
     private JLabel whiteCapturedPieceArea;
@@ -46,7 +44,7 @@ public class P2PChess {
 
     private static final int PIECE_SIZE = 50;
 
-    public P2PChess(CardLayout cardLayout, JPanel mainPanel) {
+    public P2PChess(CardLayout cardLayout, JPanel mainPanel, Settings settings) {
         this.mainPanel = mainPanel;
         this.cardLayout = cardLayout;
         this.chessBoardPanel = new JPanel(new BorderLayout());
@@ -63,8 +61,7 @@ public class P2PChess {
         this.rightClickHighlightedCol = -1;
         this.whiteTurn = true;
         this.moveNumber = 1;
-        this.PRIMARY_COLOR = Settings.WHITE_COLOR;
-        this.ALTERNATIVE_COLOR = Settings.BROWN_COLOR;
+        this.settings = settings;
     }
 
     public JPanel getChessBoardPanel() {
@@ -389,6 +386,7 @@ public class P2PChess {
         Piece piece = board.getPieceAt(row, col);
         JButton button = tileButtons[row][col];
         button.setRolloverEnabled(false);
+        button.setBorder(BorderFactory.createRaisedBevelBorder());
 
         //If the board has a piece on it, set that tile to display the proper piece
         if (piece != null) {
@@ -513,15 +511,21 @@ public class P2PChess {
         for (int row = 0; row < Board.BOARD_SIZE; row++) {
             for (int col = 0; col < Board.BOARD_SIZE; col++) {
                 if ((row + col) % 2 == 0) {
-                    tileButtons[row][col].setBackground(PRIMARY_COLOR);
+                    tileButtons[row][col].setBackground(settings.getPrimaryColor());
                 } else {
-                    tileButtons[row][col].setBackground(ALTERNATIVE_COLOR);
+                    tileButtons[row][col].setBackground(settings.getAlternativeColor());
                 }
 
                 tileButtons[row][col].setBorder(tempButton.getBorder()); //Resets to the proper border after moving
+                tileButtons[row][col].setBorder(BorderFactory.createRaisedBevelBorder());
                 chessBoardPanel.repaint();
             }
         }
+    }
+    
+    //Called through Settings
+    public void updateBoardColors() {
+        resetHighlightedTiles();
     }
 
     /**
@@ -535,9 +539,9 @@ public class P2PChess {
      */
     private void assignTileColor(JButton button, int row, int col) {
         if ((row + col) % 2 == 0) {
-            button.setBackground(PRIMARY_COLOR);
+            button.setBackground(settings.getPrimaryColor());
         } else {
-            button.setBackground(ALTERNATIVE_COLOR);
+            button.setBackground(settings.getAlternativeColor());
         }
     }
 
@@ -580,7 +584,7 @@ public class P2PChess {
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //TODO
+                cardLayout.show(mainPanel, "Start Screen");
             }
         });
     }
@@ -589,7 +593,7 @@ public class P2PChess {
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //TODO
+                cardLayout.show(mainPanel, "Settings");
             }
         });
     }

@@ -27,19 +27,13 @@ public class King extends Piece {
 
     public boolean isKingInCheck(Integer newRow, Integer newCol, Board board) {
         boolean isKingChecked = false;
-        Integer curRow = newRow;
-        Integer curCol = newCol;
-
-        if (newRow == curRow && newCol == curCol) { //Cannot move king onto same tile
-            return false;
-        }
-
+        
         for (int row = 0; row < Board.BOARD_SIZE; row++) {
             for (int col = 0; col < Board.BOARD_SIZE; col++) {
                 Piece attacker = board.getPieceAt(row, col);
 
-                if (attacker != null && attacker.getPieceColor() != pieceColor) { //If the potential attacker is a piece of opposing color
-                    if (attacker.isValidMove(curRow, curCol, board)) { //If the potential attacker has a valid move on where the king is
+                if (attacker != null && attacker.getPieceColor() != pieceColor && !(attacker instanceof King)) { //If the potential attacker is a piece of opposing color
+                    if (attacker.isValidMove(newRow, newCol, board)) { //If the potential attacker has a valid move on where the king is
                         isKingChecked = true; //The king is checked
 
                         break;
@@ -78,49 +72,54 @@ public class King extends Piece {
     }
 
     private boolean canCastle(Integer newRow, Integer newCol, Board board) {
-        //The direction of castling: kingside or queenside
-        int direction = (newCol > getPieceCol()) ? 1 : -1;
-        
+        int direction = (newCol > getPieceCol()) ? 1 : -1; //1 for kingside, -1 for queenside
+
         //Ensure the King is not in check
-        if (isKingInCheck(getPieceRow(), getPieceCol(), board)) {
+        if (isKingInCheck(this.getPieceRow(), this.getPieceCol(), board)) {
             return false;
         }
-    
-        //Check the squares between the King and Rook are clear
-        int curCol = getPieceCol();
-        int startCol = curCol + direction;
-        int endCol = newCol;
-        
+
+        //Check if the squares between the King and the Rook are clear
+        int startCol = getPieceCol() + direction; //First square the king will move through
+        int endCol = (direction == 1) ? Board.COL_H : Board.COL_A; //Rook's position column
+
         for (int col = startCol; col != endCol; col += direction) {
             if (board.getPieceAt(getPieceRow(), col) != null) {
+                //Found a blocking piece
                 return false;
             }
         }
-    
-        //Identify the Rook's position
-        Piece rook = null;
-        if (direction == 1) { //Kingside castling
-            rook = board.getPieceAt(getPieceRow(), Board.COL_H);
-        } else { //Queenside castling
-            rook = board.getPieceAt(getPieceRow(), Board.COL_A);
-        }
-    
+
+        //Find the Rook's position
+        int rookCol = (direction == 1) ? Board.COL_H : Board.COL_A;
+        Piece rook = board.getPieceAt(getPieceRow(), rookCol);
+
         //Ensure the Rook is present and hasn't moved
-        if (rook != null && rook instanceof Rook) {
-            Rook rookPiece = (Rook) rook;
-            if (!rookPiece.getHasMoved()) {
-                //Finally, check if the King passes through any attacked squares
-                if (isKingInCheck(getPieceRow(), startCol, board) || isKingInCheck(getPieceRow(), endCol, board)) {
-                    return false;
-                }
-    
-                return true;
+        if (rook == null || !(rook instanceof Rook) || ((Rook) rook).getHasMoved()) {
+            return false;
+        }
+
+        //Check if the King passes through any attacked squares
+        int[] threatCols = (direction == 1) ? new int[]{Board.COL_F, Board.COL_G} : new int[]{Board.COL_C, Board.COL_D};
+
+        for (int col : threatCols) {
+            if (isKingInCheck(getPieceRow(), col, board)) {
+                return false;
             }
         }
-    
-        return false;
-    }    
 
+        return true;
+    }
+
+    /**
+     * isMoveCastle()
+     * 
+     * Returns true if the incoming king move is an attempted castle, false if not
+     * 
+     * @param newRow
+     * @param newCol
+     * @return
+     */
     private boolean isMoveCastle(Integer newRow, Integer newCol) {
         Integer curRow = this.getPieceRow();
 
@@ -128,17 +127,11 @@ public class King extends Piece {
             return false;
         }
 
-        if (getPieceColor() == Color.WHITE) { //Case for white-side castle
-            if (newRow == curRow && newCol == Board.COL_G) { //King side castle
-                return true;
-            }
-        } else {
-            if (newRow == curRow && newCol == Board.COL_C) { //Queen side castle
-                return true;
-            }
+        if (newRow != curRow) { //Early exit if this is the case
+            return false;
         }
 
-        return false;
+        return newCol == Board.COL_G || newCol == Board.COL_C;
     }
 
     @Override
@@ -147,6 +140,10 @@ public class King extends Piece {
         int curCol = this.getPieceCol();
         int rowDiff = Math.abs(newRow - curRow);
         int colDiff = Math.abs(newCol - curCol);
+
+        if (newRow == curRow && newCol == curCol) { //Cannot move king onto same tile
+            return false;
+        }
 
         if (isKingInCheck(newRow, newCol, board)) { //Cannot move king into a checked tile
             return false;
@@ -172,36 +169,12 @@ public class King extends Piece {
         Integer curRow = this.getPieceRow();
         Integer curCol = this.getPieceCol();
         
-        if (isMoveCastle(newRow, newCol) && canCastle(newRow, newCol, board)) { //Castle behavior
-            //Remove old position from board
-            board.setPieceAt(curRow, curCol, null);
+        if (isValidMove(newRow, newCol, board)) {
+            boolean isCastling = isMoveCastle(newRow, newCol) && canCastle(newRow, newCol, board);
 
-            //Update piece position
-            this.setPieceRow(newRow);
-            this.setPieceCol(newCol);
-
-            //Update board with new piece position
-            board.setPieceAt(newRow, newCol, this);
-
-            //Additionally move the rook
-            int rookRow = getPieceRow();
-            int rookCol = (newCol > curCol) ? Board.COL_H : Board.COL_A;
-            int rookNewCol = (newCol > curCol) ? newCol - 1 : newCol + 1;
-            Piece rook = board.getPieceAt(curRow, rookCol);
-            Rook rookPiece = (Rook) rook;
-            
-            //Set new row and col for the rook
-            rookPiece.setPieceRow(curRow);
-            rookPiece.setPieceCol(rookNewCol);
-
-            //Update board with new piece position
-            board.setPieceAt(curRow, rookNewCol, rookPiece);
-
-            //Set old rook position to null and update hasMoved
-            board.setPieceAt(rookRow, rookCol, null);
-            rookPiece.setHasMoved(true);
-        } else { //Normal movement
-            if (isValidMove(newRow, newCol, board) && !isKingInCheck(newRow, newCol, board)) {
+            if (isCastling) {
+                castle(curRow, curCol, newRow, newCol, board);
+            } else {
                 Piece captured = board.getPieceAt(newRow, newCol);
     
                 //Handle captures
@@ -223,10 +196,45 @@ public class King extends Piece {
     
                 //Update board with new piece position
                 board.setPieceAt(newRow, newCol, this);
-            } else {
-                System.out.println("Invalid Move"); 
             }
+        } else {
+            System.out.println("Invalid Move"); 
         }
+    }
+
+    private void castle(Integer row, Integer col, Integer newRow, Integer newCol, Board board) {
+        //Remove old position from board
+        board.setPieceAt(row, col, null);
+
+        //Update piece position
+        this.setPieceRow(newRow);
+        this.setPieceCol(newCol);
+
+        //Update board with new piece position
+        board.setPieceAt(newRow, newCol, this);
+
+        //If not the first move set it equal to true
+        if (!hasMoved) {
+            setHasMoved(true);
+        }
+
+        //Additionally move the rook
+        int rookRow = getPieceRow();
+        int rookCol = (newCol > col) ? Board.COL_H : Board.COL_A;
+        int rookNewCol = (newCol > col) ? newCol - 1 : newCol + 1;
+        Piece rook = board.getPieceAt(row, rookCol);
+        Rook rookPiece = (Rook) rook;
+        
+        //Set new row and col for the rook
+        rookPiece.setPieceRow(row);
+        rookPiece.setPieceCol(rookNewCol);
+
+        //Update board with new piece position
+        board.setPieceAt(row, rookNewCol, rookPiece);
+
+        //Set old rook position to null and update hasMoved
+        board.setPieceAt(rookRow, rookCol, null);
+        rookPiece.setHasMoved(true);
     }
     
 }
