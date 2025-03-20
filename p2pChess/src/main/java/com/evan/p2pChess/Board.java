@@ -3,13 +3,13 @@ package com.evan.p2pChess;
 import com.evan.p2pChess.Pieces.*;
 
 /**
- * Board
- * 
- * Bunch on "tiles"
+ * Creates the controller for the main chess board and places each specific piece on it's designated spot on the board.
+ * Contains many helpful methods to reset, print, place, and remove pieces and the board.
  * 
  * @author Evan Delanty
+ * @version v1.0.0
+ * @since 3/19/2025
  */
-
 public class Board {
     //General values
     public static final int BOARD_SIZE = 8;
@@ -63,7 +63,13 @@ public class Board {
         board[x][y].setPiece(piece);
     }
 
-    //Sets up a standard board
+    /**
+     * resetBoard()
+     * 
+     * Iterates through the size of the board and sets a null piece to represent a blank tile.
+     * Then recreates a class board through setBoardPieces().
+     * 
+     */
     public void resetBoard() {
         //Sets all squares of the board to be empty tiles
         for (int i = 0; i < BOARD_SIZE; i++) {
@@ -75,6 +81,12 @@ public class Board {
         setBoardPieces();
     }
 
+    /**
+     * setBoardPieces()
+     * 
+     * Places each piece onto the board based on class chess positioning.
+     * 
+     */
     public void setBoardPieces() {
         //Inits pawns
         for (int i = 0; i < BOARD_SIZE; i++) {
@@ -109,7 +121,13 @@ public class Board {
         board[BLACK_BACK_ROW][4].setPiece(new King(new Integer[][]{{BLACK_BACK_ROW, COL_E}}, Color.BLACK, blackPlayer)); //Black king
     }
 
-    //Prints ze board
+    /**
+     * printBoardToTerminal()
+     * 
+     * Iterates through the board and prints out each piece and a . for an empty tile.
+     * Used for debugging!
+     * 
+     */
     public void printBoardToTerminal() {
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
@@ -119,15 +137,21 @@ public class Board {
                     System.out.print(". ");
                 }
                 
-                //Newline at the end of each row
-                if (j == BOARD_SIZE - 1) {
+                if (j == BOARD_SIZE - 1) { //Newline at the end of each row
                     System.out.print("\n");
                 }
             }
         }
     }
 
-    //Handle scoring
+    /**
+     * capturePiece()
+     * 
+     * Adds points to the specified player based on the given piece value.
+     * Additionally plays the capture sound.
+     * 
+     * @param captured Used to determine which player to add points to and the captured piece's value.
+     */
     public void capturePiece(Piece captured) {
         if (captured.getPieceColor() == Color.WHITE) { //If the captured piece was white add to blackPlayers score
             blackPlayer.addPoints(captured.getPieceValue());
@@ -138,10 +162,22 @@ public class Board {
         playPieceCaptureSound();
     }
 
+    /**
+     * playPieceMovingSound()
+     * 
+     * Calls the play method from the SoundManager class to play the move sound.
+     * 
+     */
     public void playPieceMovingSound() {
         SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/move.wav"));
     }
 
+    /**
+     * playPieceCaptureSound()
+     * 
+     * Calls the play method from the SoundManager class to play the capture sound.
+     * 
+     */
     public void playPieceCaptureSound() {
         SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/capture.wav"));
     } 
