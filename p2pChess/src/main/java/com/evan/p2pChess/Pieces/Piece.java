@@ -177,6 +177,10 @@ public abstract class Piece implements Movement {
             tempCol = curCol + direction;
 
             while (tempCol != newCol) { //While we haven't reached the destination tile
+                if (tempRow < 0 || tempRow >= Board.BOARD_SIZE || tempCol < 0 || tempCol >= Board.BOARD_SIZE) {
+                    return false; //Early exit if invalid direction
+                }
+                
                 if (board.getPieceAt(curRow, tempCol) != null) {
                     isStraightPathClear = false;
 

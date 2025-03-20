@@ -9,6 +9,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -24,6 +25,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import com.evan.p2pChess.Game;
 import com.evan.p2pChess.SoundManager;
 
 public class Settings {
@@ -50,14 +52,22 @@ public class Settings {
     public static final Color PURPLE_LIGHT_COLOR = new Color(213, 192, 255);
     public static final Color PURPLE_DARK_COLOR = new Color(118, 90, 151);
 
+    public static final Integer BULLET_TIME = 1;
+    public static final Integer BLITZ_TIME = 3;
+    public static final Integer STANDARD_TIME = 10;
+
     private JPanel settingsPanel;
     private CardLayout cardLayout;
     private JPanel mainPanel;
     private JButton backButton;
     private JCheckBox soundCheckbox;
+    private JButton bulletModeButton;
+    private JButton blitzModeButton;
+    private JButton standardModeButton;
     private P2PChess p2pChess;
     private Color primaryColor;
     private Color alternativeColor;
+    private Integer timeSelection;
     private static boolean isSoundEnabled;
 
     public Settings(CardLayout cardLayout, JPanel mainPanel) {
@@ -76,8 +86,12 @@ public class Settings {
         this.p2pChess = null;
         this.backButton = new JButton("Back");
         this.soundCheckbox = new JCheckBox("Enable Sound");
+        this.bulletModeButton = createResizedIconButton("/com/evan/p2pChess/Gui/Images/Game Mode/bullet.png", 200, 125);
+        this.blitzModeButton = createResizedIconButton("/com/evan/p2pChess/Gui/Images/Game Mode/blitz.png", 200, 125);
+        this.standardModeButton = createResizedIconButton("/com/evan/p2pChess/Gui/Images/Game Mode/standard.png", 200, 125);
         this.primaryColor = WHITE_COLOR;
         this.alternativeColor = BROWN_COLOR;
+        this.timeSelection = 1;
         Settings.isSoundEnabled = true;
     }
 
@@ -98,6 +112,10 @@ public class Settings {
         return isSoundEnabled;
     }
 
+    public Integer getTimeSelection() {
+        return timeSelection;
+    }
+
     //Setters
     public void setP2pChess(P2PChess p2pChess) {
         this.p2pChess = p2pChess;
@@ -105,6 +123,10 @@ public class Settings {
 
     public void setIsSoundEnabled(boolean isSoundEnabled) {
         Settings.isSoundEnabled = isSoundEnabled;
+    }
+
+    public void setTimeSelection(Integer timeSelection) {
+        this.timeSelection = timeSelection;
     }
 
     public void runGUI() {
@@ -160,6 +182,19 @@ public class Settings {
         soundCheckbox.setAlignmentX(Component.CENTER_ALIGNMENT);
         soundCheckbox.setSelected(true);
         
+        //Gamemode options
+        JPanel modePanel = new JPanel();
+        modePanel.setOpaque(false);
+        modePanel.setLayout(new BoxLayout(modePanel, BoxLayout.X_AXIS));
+        modePanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        modePanel.add(Box.createHorizontalStrut(15));
+        modePanel.add(bulletModeButton);
+        modePanel.add(Box.createHorizontalStrut(15));
+        modePanel.add(blitzModeButton);
+        modePanel.add(Box.createHorizontalStrut(15));
+        modePanel.add(standardModeButton);
+        
         //Title for color options
         JLabel colorOptionsLabel = new JLabel("Board Color Options");
         colorOptionsLabel.setFont(new Font("Arial", Font.BOLD, 20));
@@ -183,15 +218,31 @@ public class Settings {
         addColorOption(colorGrid, CORAL_LIGHT_COLOR, CORAL_DARK_COLOR, "Coral");
         addColorOption(colorGrid, PURPLE_LIGHT_COLOR, PURPLE_DARK_COLOR, "Purple");
 
-        mainPanel.add(Box.createVerticalStrut(20));
+        mainPanel.add(Box.createVerticalStrut(10));
         mainPanel.add(soundCheckbox);
         mainPanel.add(Box.createVerticalStrut(20));
         mainPanel.add(colorOptionsLabel);
         mainPanel.add(Box.createVerticalStrut(10));
         mainPanel.add(colorGrid);
         mainPanel.add(Box.createVerticalStrut(20));
-        
+        mainPanel.add(modePanel);
+        mainPanel.add(Box.createVerticalStrut(10));
+
         return mainPanel;
+    }
+
+    private JButton createResizedIconButton(String path, int width, int height) {
+        ImageIcon icon = new ImageIcon(getClass().getResource(path));
+        Image scaled = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
+        JButton button = new JButton(new ImageIcon(scaled));
+        button.setContentAreaFilled(false);
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createLineBorder(null));
+        button.setOpaque(false);
+        button.setPreferredSize(new Dimension(width, height));
+        button.setRolloverEnabled(true);
+    
+        return button;
     }
     
     private void addColorOption(JPanel parent, final Color lightColor, final Color darkColor, String tooltip) {
@@ -229,7 +280,6 @@ public class Settings {
         colorPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent evt) {
-                //Play sound
                 SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/select.wav"));
                 
                 //Set selected border
@@ -269,6 +319,20 @@ public class Settings {
         return panel;
     }
 
+    /**
+     * highlightSelectedMode()
+     * 
+     * Sets all the buttons borders off when a different mode is selected.
+     * 
+     * @param selected
+     */
+    private void highlightSelectedMode(JButton selected) {
+        bulletModeButton.setBorder(null);
+        blitzModeButton.setBorder(null);
+        standardModeButton.setBorder(null);
+        selected.setBorder(BorderFactory.createLineBorder(SELECTED_COLOR, 3));
+    }    
+
     private void setupListeners() {
         backButton.addActionListener(new ActionListener() {
             @Override
@@ -289,6 +353,45 @@ public class Settings {
             @Override 
             public void mouseExited(MouseEvent e) {
                 backButton.setBackground(Settings.WHITE_COLOR);
+            }
+        });
+
+        bulletModeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!p2pChess.getHasFirstMove()) {
+                    SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/select.wav"));
+                    setTimeSelection(BULLET_TIME);
+                    p2pChess.setWhiteTimerLabel(BULLET_TIME.toString());
+                    p2pChess.setBlackTimerLabel(BULLET_TIME.toString());
+                    highlightSelectedMode(bulletModeButton);
+                }
+            }
+        });
+
+        blitzModeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!p2pChess.getHasFirstMove()) {
+                    SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/select.wav"));
+                    setTimeSelection(BLITZ_TIME);
+                    p2pChess.setWhiteTimerLabel(BLITZ_TIME.toString());
+                    p2pChess.setBlackTimerLabel(BLITZ_TIME.toString());
+                    highlightSelectedMode(blitzModeButton);
+                }
+            }
+        });
+
+        standardModeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!p2pChess.getHasFirstMove()) {
+                    SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/select.wav"));
+                    setTimeSelection(STANDARD_TIME);
+                    p2pChess.setWhiteTimerLabel(STANDARD_TIME.toString());
+                    p2pChess.setBlackTimerLabel(STANDARD_TIME.toString());
+                    highlightSelectedMode(standardModeButton);
+                }
             }
         });
 

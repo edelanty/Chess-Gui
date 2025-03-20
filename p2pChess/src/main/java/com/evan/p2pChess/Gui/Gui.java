@@ -1,12 +1,16 @@
 package com.evan.p2pChess.Gui;
 
 import javax.swing.*;
+
+import com.evan.p2pChess.Game;
+
 import java.awt.*;
 
 public class Gui {
     private JFrame mainWindowFrame;
     private CardLayout cardLayout;
     private JPanel mainPanel;
+    private Game game;
 
     public Gui() {
         this.mainWindowFrame = new JFrame("P2P Chess");
@@ -14,13 +18,13 @@ public class Gui {
         this.mainWindowFrame.setBackground(Color.WHITE);
         this.cardLayout = new CardLayout();
         this.mainPanel = new JPanel(cardLayout);
+        this.game = null;
     }
 
     private void setupGui() {
-        //Instantiate swing objects (start screen, main board screen, etc...)
         StartScreen startScreen = new StartScreen(cardLayout, mainPanel);
         Settings settings = new Settings(cardLayout, mainPanel);
-        P2PChess p2pChess = new P2PChess(cardLayout, mainPanel, settings);
+        P2PChess p2pChess = new P2PChess(cardLayout, mainPanel, settings, game);
         startScreen.runGUI();
         p2pChess.runGUI();
         settings.runGUI();
@@ -46,7 +50,8 @@ public class Gui {
      * Calls setupGui to load the mainPanel and cardLayout, then sets the main window frame to be visible.
      * 
      */
-    public void runGui() {
+    public void runGui(Game game) {
+        this.game = game;
         setupGui();
         this.mainWindowFrame.setVisible(true);
     }
