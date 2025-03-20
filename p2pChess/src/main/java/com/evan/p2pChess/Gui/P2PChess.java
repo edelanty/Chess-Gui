@@ -271,15 +271,7 @@ public class P2PChess {
         exitButton.setForeground(Color.BLACK);
 
         //Create timer labels
-        blackTimerLabel = new JLabel("Black: " + settings.getTimeSelection().toString() + ":00", JLabel.CENTER);
-        blackTimerLabel.setFont(new Font("Serif", Font.BOLD, 24));
-        blackTimerLabel.setForeground(Color.BLACK);
-        blackTimerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        whiteTimerLabel = new JLabel("White: " + settings.getTimeSelection().toString() + ":00", JLabel.CENTER);
-        whiteTimerLabel.setFont(new Font("Serif", Font.BOLD, 24));
-        whiteTimerLabel.setForeground(Color.BLACK);
-        whiteTimerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        styleTimerLabels();
 
         //Create action listeners
         createExitButtonActionListener(exitButton);
@@ -300,7 +292,29 @@ public class P2PChess {
 
         return sidePanel;
     }
-    
+
+    private void styleTimerLabels() {
+        Font timerFont = new Font("Arial", Font.PLAIN, 20);
+
+        //Black Timer Label
+        blackTimerLabel = new JLabel("Black: " + settings.getTimeSelection().toString() + ":00", JLabel.CENTER);
+        blackTimerLabel.setFont(timerFont);
+        blackTimerLabel.setForeground(Color.WHITE);
+        blackTimerLabel.setBackground(Settings.GRAY_DARK_BOX_COLOR);
+        blackTimerLabel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        blackTimerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        blackTimerLabel.setOpaque(true);
+
+        //White Timer Label
+        whiteTimerLabel = new JLabel("White: " + settings.getTimeSelection().toString() + ":00", JLabel.CENTER);
+        whiteTimerLabel.setFont(timerFont);
+        whiteTimerLabel.setForeground(Color.WHITE);
+        whiteTimerLabel.setBackground(Settings.GRAY_DARK_BOX_COLOR);
+        whiteTimerLabel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        whiteTimerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        whiteTimerLabel.setOpaque(true);
+    }
+
     //Helper method to create consistently styled buttons for the side panel
     private JButton createSidePanelButton(String text) {
         JButton button = new JButton(text);

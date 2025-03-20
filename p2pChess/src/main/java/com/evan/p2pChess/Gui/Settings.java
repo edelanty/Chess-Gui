@@ -25,7 +25,6 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import com.evan.p2pChess.Game;
 import com.evan.p2pChess.SoundManager;
 
 public class Settings {
@@ -51,6 +50,9 @@ public class Settings {
     public static final Color CORAL_DARK_COLOR = new Color(143, 96, 79);
     public static final Color PURPLE_LIGHT_COLOR = new Color(213, 192, 255);
     public static final Color PURPLE_DARK_COLOR = new Color(118, 90, 151);
+    public static final Color GRAY_LIGHT_TEXT_COLOR = new Color(192, 192, 192);
+    public static final Color GRAY_DARK_BOX_COLOR = new Color(50, 50, 50);
+    public static final Color GRAY_LIGHT_BOX_COLOR = new Color(80, 80, 80);
 
     public static final Integer BULLET_TIME = 1;
     public static final Integer BLITZ_TIME = 3;
