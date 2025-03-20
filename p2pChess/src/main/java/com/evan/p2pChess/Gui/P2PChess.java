@@ -116,10 +116,22 @@ public class P2PChess {
         blackTimerLabel.setText("Black: " + timeSetting + ":00");
     }
 
-    public void runGUI() {
+    /**
+     * runGui()
+     * 
+     * Called from the Gui class to instantiate this panel.
+     * 
+     */
+    public void runGui() {
         setupGui();
     }
 
+    /**
+     * setupGui()
+     * 
+     * Adds all the required elements to the main panel used for this class in each area of the border layout.
+     * 
+     */
     private void setupGui() {
         board.resetBoard();
         chessBoardPanel.add(createChessBoardPanel(), BorderLayout.CENTER);
@@ -158,6 +170,13 @@ public class P2PChess {
         return gridPanel;
     }
 
+    /**
+     * createMoveHistoryPanel()
+     * 
+     * Creates the right-side panel with the move history for both players.
+     * 
+     * @return moveListPanel to be used on the chessBoardPanel
+     */
     private JPanel createMoveHistoryPanel() {
         JPanel moveListPanel = new JPanel(new GridLayout(2, 1));
 
@@ -243,6 +262,13 @@ public class P2PChess {
         return whiteCapturedPanel;
     }
 
+    /**
+     * createSidePanel()
+     * 
+     * Creates all the needed gui elements for the left-side panel of the chess board gui.
+     * 
+     * @return sidePanel which contains all the elements needed.
+     */
     private JPanel createSidePanel() {
         //Create the side panel with a white background to match the rest of UI
         JPanel sidePanel = new JPanel();
@@ -293,6 +319,12 @@ public class P2PChess {
         return sidePanel;
     }
 
+    /**
+     * styleTimerLabels()
+     * 
+     * Creates the initial gui elements for the black and white timers.
+     * 
+     */
     private void styleTimerLabels() {
         Font timerFont = new Font("Arial", Font.PLAIN, 20);
 
@@ -315,7 +347,14 @@ public class P2PChess {
         whiteTimerLabel.setOpaque(true);
     }
 
-    //Helper method to create consistently styled buttons for the side panel
+    /**
+     * createSidePanelButton()
+     * 
+     * Helper method to create consistently styled buttons for the side panel.
+     * 
+     * @param text
+     * @return
+     */
     private JButton createSidePanelButton(String text) {
         JButton button = new JButton(text);
         button.setForeground(Color.BLACK);
@@ -417,6 +456,14 @@ public class P2PChess {
         }
     }
 
+    /**
+     * handleRightTileClick()
+     * 
+     * Shows possible moves for any right clicked piece.
+     * 
+     * @param row
+     * @param col
+     */
     private void handleRightTileClick(int row, int col) {
         Piece clickedPiece = board.getPieceAt(row, col);
 
@@ -556,6 +603,14 @@ public class P2PChess {
         blackScore.setText(blackPlayer.getPlayerPoints().toString());
     }
 
+    /**
+     * updateCapturedPieceDisplay()
+     * 
+     * Helper function for the captured piece area for both the black and white pieces.
+     * Adds the pieces from each players captures into the hasmap to be formatted later and displayed.
+     * 
+     * @param piece
+     */
     private void updateCapturedPieceDisplay(Piece piece) {
         //Insert into the player captured pieces queue and update the GUI
         String symbol = piece.getPieceSymbol();
@@ -571,6 +626,14 @@ public class P2PChess {
         }
     }
 
+    /**
+     * formatCapturedPiecesDisplay()
+     * 
+     * Formats the piece entries utilizing a hashmap to efficiently create the count of a certain captured piece.
+     * 
+     * @param capturedMap
+     * @return
+     */
     private String formatCapturedPiecesDisplay(Map<String, Integer> capturedMap) {
         StringBuilder sb = new StringBuilder();
 
@@ -633,6 +696,12 @@ public class P2PChess {
         chessBoardPanel.repaint();
     }
 
+    /**
+     * resetHighlightedTiles()
+     * 
+     * Iterates through the entire board and resets the original colors of the tiles to get rid of the potential move highlights.
+     * 
+     */
     private void resetHighlightedTiles() {
         JButton tempButton = new JButton();
 
@@ -651,7 +720,12 @@ public class P2PChess {
         }
     }
     
-    //Called through Settings
+    /**
+     * updateBoardColors()
+     * 
+     * Availible for the settings class to allow the user to change their primary and alt colors.
+     * 
+     */
     public void updateBoardColors() {
         resetHighlightedTiles();
         resetPanelAndButtonColors();
@@ -704,6 +778,15 @@ public class P2PChess {
         return file + String.valueOf(rank);
     }
 
+    /**
+     * createTileActionListener()
+     * 
+     * Creates the action listener for any tile which simply calls handleClick when anyone of them is pressed.
+     * 
+     * @param button
+     * @param row
+     * @param col
+     */
     private void createTileActionListener(JButton button, int row, int col) {
         button.addActionListener(new ActionListener() {
             @Override
@@ -713,6 +796,15 @@ public class P2PChess {
         });
     }
 
+     /**
+     * createRightClickTileActionListener()
+     * 
+     * Creates the action listener for any tile which simply calls handleRightClick when anyone of them is pressed with right click.
+     * 
+     * @param button
+     * @param row
+     * @param col
+     */
     private void createRightClickTileActionListener(JButton button, int row, int col) {
         button.addMouseListener(new MouseAdapter() {
             @Override
@@ -724,6 +816,13 @@ public class P2PChess {
         });
     }
 
+    /**
+     * createExitButtonActionListener()
+     * 
+     * Creates an action listener for the exit button on the chess board gui, takes the user back to the start screen.
+     * 
+     * @param button
+     */
     private void createExitButtonActionListener(JButton button) {
         button.addActionListener(new ActionListener() {
             @Override
@@ -732,7 +831,14 @@ public class P2PChess {
             }
         });
     }
-
+    
+    /**
+     * createSettingsButtonActionListener()
+     * 
+     * Creates an action listener for the settings button, allows a user to shift the main panel to the settings page.
+     * 
+     * @param button
+     */
     private void createSettingsButtonActionListener(JButton button) {
         button.addActionListener(new ActionListener() {
             @Override
@@ -742,6 +848,13 @@ public class P2PChess {
         });
     }
 
+    /**
+     * createResignButtonActionListener()
+     * 
+     * Creates an action listener for the resign button.
+     * 
+     * @param button
+     */
     private void createResignButtonActionListener(JButton button) {
         button.addActionListener(new ActionListener() {
             @Override

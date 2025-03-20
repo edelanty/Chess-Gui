@@ -26,7 +26,7 @@ public class Gui {
         Settings settings = new Settings(cardLayout, mainPanel);
         P2PChess p2pChess = new P2PChess(cardLayout, mainPanel, settings, game);
         startScreen.runGUI();
-        p2pChess.runGUI();
+        p2pChess.runGui();
         settings.runGUI();
         settings.setP2pChess(p2pChess);
 
