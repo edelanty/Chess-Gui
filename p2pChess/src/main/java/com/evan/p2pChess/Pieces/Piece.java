@@ -17,6 +17,8 @@ import com.evan.p2pChess.Gui.P2PChess;
  * This is an abstract class for each piece of the game. Every piece inherits this class, and uses its features.
  * 
  * @author Evan Delanty
+ * @version v1.0.0
+ * @since 3/19/2025
  */
 public abstract class Piece implements Movement {
     protected Integer[][] piecePosition;

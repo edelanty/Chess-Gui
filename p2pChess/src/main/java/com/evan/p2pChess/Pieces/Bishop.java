@@ -5,6 +5,16 @@ import com.evan.p2pChess.Color;
 import com.evan.p2pChess.Player;
 import com.evan.p2pChess.Gui.P2PChess;
 
+/**
+ * Contains all the functionality for the Bishop piece in a classic game of chess. This class inherits from the Piece class in order
+ * to keep a well-designed OOP paradigm.
+ * Contains methods for validating a proper bishop move (diagonal, not out of bounds, etc...) and draws possible moves from its position,
+ * AND contains the move method (sets the piece given the coordinates and replaces it's old position with an empty tile).
+ * 
+ * @author Evan Delanty
+ * @version v1.0.0
+ * @since 3/19/2025
+ */
 public class Bishop extends Piece {
 
     public Bishop(Integer[][] position, Color color, Player owner) {

@@ -2,6 +2,13 @@ package com.evan.p2pChess.Pieces;
 
 import com.evan.p2pChess.Board;
 
+/**
+ * The movement interfaces contains two required functions for piece moving each implemented separate from each piece.
+ * 
+ * @author Evan Delanty
+ * @version v1.0.0
+ * @since 3/19/2025
+ */
 public interface Movement {
 
     /**

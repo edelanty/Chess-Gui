@@ -5,6 +5,17 @@ import com.evan.p2pChess.Color;
 import com.evan.p2pChess.Player;
 import com.evan.p2pChess.Gui.P2PChess;
 
+/**
+ * Contains all the functionality for the King piece in a classic game of chess. This class inherits from the Piece class in order
+ * to keep a well-designed OOP paradigm.
+ * Contains methods for validating a proper king move (one space all around, not in check after move) and draws possible moves from its position,
+ * AND contains the move method (sets the piece given the coordinates and replaces it's old position with an empty tile).
+ * Contains the logic for "checking" each king as well.
+ * 
+ * @author Evan Delanty
+ * @version v1.0.0
+ * @since 3/19/2025
+ */
 public class King extends Piece {
     private boolean isChecked;
     private boolean hasMoved;
