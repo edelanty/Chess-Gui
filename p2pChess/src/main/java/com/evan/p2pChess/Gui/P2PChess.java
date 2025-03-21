@@ -7,6 +7,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -15,17 +16,21 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.swing.BorderFactory;
-import javax.swing.Box;
+import javax.swing.*;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.Timer;
+import javax.swing.border.TitledBorder;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
 
 import com.evan.p2pChess.Board;
 import com.evan.p2pChess.Game;
@@ -57,8 +62,13 @@ public class P2PChess {
     private boolean whiteTurn;
     private int moveNumber;
 
-    private JTextArea whiteMovesArea;
-    private JTextArea blackMovesArea;
+    private JTable moveHistoryTable;
+    private DefaultTableModel moveHistoryModel;
+    private JPanel sidePanel;
+    private JPanel blackCapturedPanel;
+    private JPanel whiteCapturedPanel;
+    private JPanel moveListPanel;
+
     private JLabel whiteCapturedPieceArea;
     private JLabel blackCapturedPieceArea;
     private JTextField whiteScore;
@@ -70,6 +80,9 @@ public class P2PChess {
     private Map<String, Integer> blackCapturedPieces;
 
     private static final int PIECE_SIZE = 50;
+    private static final int MOVE_NUMBER_COLUMN_SIZE = 30;
+    private static final int WHITE_MOVE_COLUMN_SIZE = 60;
+    private static final int BLACK_MOVE_COLUMN_SIZE = 60;
 
     public P2PChess(CardLayout cardLayout, JPanel mainPanel, Settings settings, Game game) {
         this.mainPanel = mainPanel;
@@ -83,6 +96,10 @@ public class P2PChess {
         this.tileButtons = new JButton[Board.BOARD_SIZE][Board.BOARD_SIZE];
         this.selectedRow = -1;
         this.selectedCol = -1;
+        this.sidePanel = new JPanel();
+        this.blackCapturedPanel = new JPanel();
+        this.whiteCapturedPanel = new JPanel();
+        this.moveListPanel = new JPanel();
         this.settingsButton = new JButton();
         this.resignButton = new JButton();
         this.exitButton = new JButton();
@@ -173,38 +190,124 @@ public class P2PChess {
     /**
      * createMoveHistoryPanel()
      * 
-     * Creates the right-side panel with the move history for both players.
+     * Creates the right-side panel with the combined move history for both players.
+     * Displays moves in format: "1. ♙e2  ♞c3"
      * 
      * @return moveListPanel to be used on the chessBoardPanel
      */
     private JPanel createMoveHistoryPanel() {
-        JPanel moveListPanel = new JPanel(new GridLayout(2, 1));
+        //Create a panel with custom background color
+        moveListPanel = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.setColor(settings.getPrimaryColor());
+                g.fillRect(0, 0, getWidth(), getHeight());
+            }
+        };
+        
+        moveListPanel.setOpaque(true);
+        moveListPanel.setBackground(settings.getPrimaryColor());
 
-        whiteMovesArea = new JTextArea();
-        blackMovesArea = new JTextArea();
+        //Create table model with three columns: Move#, White, Black
+        moveHistoryModel = new DefaultTableModel(
+            new Object[][] {}, 
+            new String[] {"#", "White", "Black"}
+        ) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        
+        //Create table with the model and custom background painting
+        moveHistoryTable = new JTable(moveHistoryModel) {
+            @Override
+            public boolean isCellSelected(int row, int column) {
+                return false;
+            }
+            
+            @Override
+            protected void paintComponent(Graphics g) {
+                //Paint the background with the desired color before painting the table
+                g.setColor(settings.getPrimaryColor());
+                g.fillRect(0, 0, getWidth(), getHeight());
+                super.paintComponent(g);
+            }
+        };
+        
+        //Create a custom cell renderer
+        TableCellRenderer customRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel label = (JLabel)super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                
+                //Apply alternating row colors
+                Color bgColor = row % 2 == 0 ? settings.getAlternativeColor() : settings.getPrimaryColor();
+                label.setBackground(bgColor);
+                label.setHorizontalAlignment(JLabel.CENTER);
+                
+                return label;
+            }
+        };
+        
+        //Set table appearance
+        moveHistoryTable.setOpaque(true);
+        moveHistoryTable.setFont(new Font("Serif", Font.BOLD, 20));
+        moveHistoryTable.setForeground(Color.WHITE);
+        moveHistoryTable.setRowHeight(35);
+        moveHistoryTable.setTableHeader(null);
+        moveHistoryTable.setShowGrid(false);
+        moveHistoryTable.setFocusable(false);
+        moveHistoryTable.setSelectionBackground(settings.getPrimaryColor());
+        moveHistoryTable.setSelectionForeground(Color.WHITE.darker());
+        moveHistoryTable.setCellSelectionEnabled(false);
+        moveHistoryTable.setRowSelectionAllowed(false);
+        moveHistoryTable.setColumnSelectionAllowed(false);
+        moveHistoryTable.setDragEnabled(false);
+        moveHistoryTable.setIntercellSpacing(new Dimension(0, 0));
+        
+        //Apply renderer to all columns
+        for (int i = 0; i < moveHistoryTable.getColumnCount(); i++) {
+            moveHistoryTable.getColumnModel().getColumn(i).setCellRenderer(customRenderer);
+        }
 
-        whiteMovesArea.setEditable(false);
-        whiteMovesArea.setFocusable(false);
-        blackMovesArea.setEditable(false);
-        blackMovesArea.setFocusable(false);
+        //Adjusting column size
+        TableColumnModel columnModel = moveHistoryTable.getColumnModel();
+        columnModel.getColumn(0).setPreferredWidth(MOVE_NUMBER_COLUMN_SIZE); 
+        columnModel.getColumn(1).setPreferredWidth(WHITE_MOVE_COLUMN_SIZE);
+        columnModel.getColumn(2).setPreferredWidth(BLACK_MOVE_COLUMN_SIZE);
 
-        whiteMovesArea.setFont(new Font("Serif", Font.PLAIN, 25));
-        blackMovesArea.setFont(new Font("Serif", Font.PLAIN, 25));
+        //Create a custom scroll pane with matching background
+        JScrollPane scrollPane = new JScrollPane(moveHistoryTable) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                g.setColor(settings.getPrimaryColor());
+                g.fillRect(0, 0, getWidth(), getHeight());
+                super.paintComponent(g);
+            }
+        };
+        
+        scrollPane.setOpaque(true);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.setBackground(settings.getAlternativeColor());
+        scrollPane.getViewport().setBackground(settings.getAlternativeColor());
+        scrollPane.getViewport().setOpaque(true);
 
-        JPanel whitePanel = new JPanel(new BorderLayout());
-        whitePanel.setBorder(BorderFactory.createTitledBorder(whitePlayer.getPlayerName()));
-        whitePanel.add(new JScrollPane(whiteMovesArea), BorderLayout.CENTER);
+        TitledBorder titledBorder = BorderFactory.createTitledBorder(
+            BorderFactory.createLineBorder(settings.getAlternativeColor(), 2),
+            "Move History",
+            TitledBorder.CENTER,
+            TitledBorder.TOP,
+            new Font("Serif", Font.PLAIN, 14),
+            Color.BLACK
+        );
 
-        JPanel blackPanel = new JPanel(new BorderLayout());
-        blackPanel.setBorder(BorderFactory.createTitledBorder(blackPlayer.getPlayerName()));
-        blackPanel.add(new JScrollPane(blackMovesArea), BorderLayout.CENTER);
+        moveListPanel.setBorder(titledBorder);
 
-        whiteMovesArea.setPreferredSize(new Dimension(150, 0));
-        blackMovesArea.setPreferredSize(new Dimension(150, 0));
-
-        moveListPanel.add(whitePanel);
-        moveListPanel.add(blackPanel);
-
+        moveListPanel.add(scrollPane, BorderLayout.CENTER);
+        moveListPanel.setPreferredSize(new Dimension(175, 300)); 
+        
         return moveListPanel;
     }
 
@@ -216,8 +319,15 @@ public class P2PChess {
      * @return the captured piece JPanel
      */
     private JPanel createBlackCapturedPiecePanel() {
-        JPanel blackCapturedPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        blackCapturedPanel.setBorder(BorderFactory.createTitledBorder("Black Captured Pieces"));
+        blackCapturedPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        blackCapturedPanel.setBorder(BorderFactory.createTitledBorder(
+            BorderFactory.createLineBorder(settings.getAlternativeColor(), 2),
+            "Black Captured Pieces",
+            TitledBorder.LEFT,
+            TitledBorder.TOP,
+            new Font("Serif", Font.PLAIN, 14),
+            Color.BLACK
+        ));
         blackCapturedPieceArea = new JLabel();
         blackCapturedPieceArea.setFont(new Font("Serif", Font.PLAIN, 25));
         blackCapturedPieceArea.setText(" ");
@@ -226,11 +336,14 @@ public class P2PChess {
         blackScore.setFont(new Font("Serif", Font.PLAIN, 25));
         blackScore.setFocusable(false);
         blackScore.setBorder(null);
+        blackScore.setBackground(settings.getPrimaryColor());
         blackScore.setEditable(false);
         blackScore.setText("Score: " + blackPlayer.getPlayerPoints().toString());
 
         blackCapturedPanel.add(blackScore);
         blackCapturedPanel.add(blackCapturedPieceArea);
+
+        blackCapturedPanel.setBackground(settings.getPrimaryColor());
 
         return blackCapturedPanel;
     }
@@ -243,8 +356,15 @@ public class P2PChess {
      * @return the captured piece JPanel
      */
     private JPanel createWhiteCapturedPiecePanel() {
-        JPanel whiteCapturedPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        whiteCapturedPanel.setBorder(BorderFactory.createTitledBorder("White Captured Pieces"));
+        whiteCapturedPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        whiteCapturedPanel.setBorder(BorderFactory.createTitledBorder(
+            BorderFactory.createLineBorder(settings.getAlternativeColor(), 2),
+            "White Captured Pieces",
+            TitledBorder.LEFT,
+            TitledBorder.TOP,
+            new Font("Serif", Font.PLAIN, 14),
+            Color.BLACK
+        ));
         whiteCapturedPieceArea = new JLabel();
         whiteCapturedPieceArea.setFont(new Font("Serif", Font.PLAIN, 25));
         whiteCapturedPieceArea.setText(" ");
@@ -253,11 +373,14 @@ public class P2PChess {
         whiteScore.setFont(new Font("Serif", Font.PLAIN, 25));
         whiteScore.setFocusable(false);
         whiteScore.setBorder(null);
+        whiteScore.setBackground(settings.getPrimaryColor());
         whiteScore.setEditable(false);
         whiteScore.setText("Score: " + whitePlayer.getPlayerPoints().toString());
 
         whiteCapturedPanel.add(whiteScore);
         whiteCapturedPanel.add(whiteCapturedPieceArea);
+
+        whiteCapturedPanel.setBackground(settings.getPrimaryColor());
 
         return whiteCapturedPanel;
     }
@@ -271,11 +394,12 @@ public class P2PChess {
      */
     private JPanel createSidePanel() {
         //Create the side panel with a white background to match the rest of UI
-        JPanel sidePanel = new JPanel();
+        sidePanel = new JPanel();
         sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.Y_AXIS));
         sidePanel.setSize(new Dimension(500, 500));
         sidePanel.setBorder(BorderFactory.createEmptyBorder(15, 5, 5, 5));
         sidePanel.setPreferredSize(new Dimension(150, 0));
+        sidePanel.setBackground(settings.getPrimaryColor());
 
         //Create the buttons using the same styling approach as the main application
         settingsButton = createSidePanelButton("Settings");
@@ -288,13 +412,13 @@ public class P2PChess {
         exitButton.setFont(new Font("Serif", Font.BOLD, 24));
 
         //Set distinct button colors for better visibility
-        settingsButton.setBackground(settings.getPrimaryColor());
-        resignButton.setBackground(settings.getPrimaryColor());
-        exitButton.setBackground(settings.getPrimaryColor());
+        settingsButton.setBackground(settings.getAlternativeColor());
+        resignButton.setBackground(settings.getAlternativeColor());
+        exitButton.setBackground(settings.getAlternativeColor());
 
-        settingsButton.setForeground(Color.BLACK);
-        resignButton.setForeground(Color.BLACK);
-        exitButton.setForeground(Color.BLACK);
+        settingsButton.setForeground(Color.WHITE);
+        resignButton.setForeground(Color.WHITE);
+        exitButton.setForeground(Color.WHITE);
 
         //Create timer labels
         styleTimerLabels();
@@ -395,6 +519,7 @@ public class P2PChess {
             //Visual effect for selecting a piece
             tileButtons[row][col].setBorder(BorderFactory.createLineBorder(java.awt.Color.RED, 3));
             tileButtons[row][col].setBackground(Settings.RED_COLOR);
+            chessBoardPanel.repaint();
         } else if (selectedRow != -1) { //This means we've clicked a piece and are about to try and move it
             Piece selectedPiece = board.getPieceAt(selectedRow, selectedCol);
             Piece destinationPiece = board.getPieceAt(row, col);
@@ -586,21 +711,56 @@ public class P2PChess {
         //Formatting the string to enter the queue
         String from = convertToAlgebraic(prevRow, prevCol);
         String to = convertToAlgebraic(row, col);
-        String moveNotation = piece.getPieceSymbol() + " " + from + " → " + to;
+        String moveNotationPlayer = from + to; //e2e4
+        String moveNotationGui = piece.getPieceSymbol() + to; //♙e4
 
-        //Inserts into the player queue and updates the GUI
+        //Inserts into the player queue
         if (piece.getPieceColor() == com.evan.p2pChess.Color.WHITE) {
-            whitePlayer.addPlayerMove(moveNumber + ". " + moveNotation);
-            whiteMovesArea.append(moveNumber + ". " + moveNotation + "\n");
+            whitePlayer.addPlayerMove(moveNotationPlayer);
+            //Add or update row in the table
+            updateMoveHistoryTable(moveNotationGui, null);
         } else {
-            blackPlayer.addPlayerMove(moveNumber + ". " + moveNotation);
-            blackMovesArea.append(moveNumber + ". " + moveNotation + "\n");
+            blackPlayer.addPlayerMove(moveNotationPlayer);
+            //Update the black move in the current row
+            updateMoveHistoryTable(null, moveNotationGui);
+            //Increment move number after black's move
             moveNumber++;
         }
 
         //Update scores as well
         whiteScore.setText(whitePlayer.getPlayerPoints().toString());
         blackScore.setText(blackPlayer.getPlayerPoints().toString());
+    }
+
+    /**
+     * Updates the move history table
+     * 
+     * @param whiteMove White's move notation (or null if updating black's move)
+     * @param blackMove Black's move notation (or null if adding white's move)
+     */
+    private void updateMoveHistoryTable(String whiteMove, String blackMove) {
+        //For white's move, add a new row
+        if (whiteMove != null) {
+            //Check if we need to add a new row
+            if (moveHistoryModel.getRowCount() < moveNumber || moveHistoryModel.getValueAt(moveNumber - 1, 1) != null) {
+                //Add a new row
+                moveHistoryModel.addRow(new Object[]{moveNumber, whiteMove, ""});
+            } else {
+                //Update existing row
+                moveHistoryModel.setValueAt(moveNumber, moveNumber - 1, 0);
+                moveHistoryModel.setValueAt(whiteMove, moveNumber - 1, 1);
+            }
+        }
+        
+        //For black's move, update the current row
+        if (blackMove != null && moveHistoryModel.getRowCount() >= moveNumber) {
+            moveHistoryModel.setValueAt(blackMove, moveNumber - 1, 2);
+        }
+        
+        //Scroll to the bottom row
+        moveHistoryTable.scrollRectToVisible(
+            moveHistoryTable.getCellRect(moveHistoryTable.getRowCount() - 1, 0, true)
+        );
     }
 
     /**
@@ -734,16 +894,54 @@ public class P2PChess {
     /**
      * resetPanelAndButtonColors()
      * 
-     * Resets colors for side panels and buttons
+     * Resets colors for side panels and buttons.
      * 
      */
     private void resetPanelAndButtonColors() {
-        Color primary = settings.getPrimaryColor();
-        whiteMovesArea.setBackground(primary);
-        blackMovesArea.setBackground(primary);
-        settingsButton.setBackground(primary);
-        resignButton.setBackground(primary);
-        exitButton.setBackground(primary);
+        Color primary = settings.getPrimaryColor(), alternative = settings.getAlternativeColor();
+        settingsButton.setBackground(alternative);
+        resignButton.setBackground(alternative);
+        exitButton.setBackground(alternative);
+        sidePanel.setBackground(primary);
+        blackScore.setBackground(primary);
+        whiteScore.setBackground(primary);
+        blackCapturedPanel.setBackground(primary);
+        whiteCapturedPanel.setBackground(primary);
+        //Update captured panel borders
+        whiteCapturedPanel.setBorder(BorderFactory.createTitledBorder(
+            BorderFactory.createLineBorder(alternative, 2),
+            "White Captured Pieces",
+            TitledBorder.LEFT,
+            TitledBorder.TOP,
+            new Font("Serif", Font.PLAIN, 14),
+            Color.BLACK
+        ));
+        blackCapturedPanel.setBorder(BorderFactory.createTitledBorder(
+            BorderFactory.createLineBorder(alternative, 2),
+            "Black Captured Pieces",
+            TitledBorder.LEFT,
+            TitledBorder.TOP,
+            new Font("Serif", Font.PLAIN, 14),
+            Color.BLACK
+        ));
+        TitledBorder titledBorder = BorderFactory.createTitledBorder(
+            BorderFactory.createLineBorder(settings.getAlternativeColor(), 2),
+            "Move History",
+            TitledBorder.CENTER,
+            TitledBorder.TOP,
+            new Font("Serif", Font.PLAIN, 14),
+            Color.BLACK
+        );
+        moveListPanel.setBorder(titledBorder);
+        //Update move history table and related components
+        moveHistoryTable.setBackground(alternative);
+        moveHistoryTable.getParent().setBackground(alternative);
+        ((JScrollPane)moveHistoryTable.getParent().getParent()).setBackground(alternative);
+        ((JScrollPane)moveHistoryTable.getParent().getParent()).getViewport().setBackground(alternative);
+        moveHistoryTable.repaint();
+        blackCapturedPanel.repaint();
+        whiteCapturedPanel.repaint();
+        sidePanel.repaint();
     }
 
     /**
