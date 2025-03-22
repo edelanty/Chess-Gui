@@ -777,6 +777,8 @@ public class P2PChessTest {
         board.resetBoard();
         String fenString = fenGen.generateFEN(board, false, 1);
         String expectedFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1";
+        System.out.println("Current Working Directory: " + System.getProperty("user.dir"));
+
         assertEquals(expectedFEN, fenString);
     }
 //TODO

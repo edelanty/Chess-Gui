@@ -3,6 +3,7 @@ package com.evan.p2pChess;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -14,6 +15,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 import java.util.function.Predicate;
+
+import java.net.URL;
 
 /**
  * Intended to communicate to the Universal Chess Interface (UCI) to find and play the best move's in the Play Against AI mode.
@@ -35,7 +38,15 @@ public class Uci {
     }
 
     public void start(String cmd) {
-        var pb = new ProcessBuilder(cmd);
+        ProcessBuilder pb;
+        if (System.getProperty("os.name").toLowerCase().contains("win")) { //Windows
+            String workingDir = System.getProperty("user.dir");
+            String enginePath = workingDir + "/p2pChess/lib/stockfish/stockfish-windows-x86-64-avx2.exe";
+            pb = new ProcessBuilder("cmd.exe", "/c", enginePath); 
+        } else { //Linux
+            pb = new ProcessBuilder(cmd);
+        }
+        
         try {
             this.process = pb.start();
             this.reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -93,6 +104,18 @@ public class Uci {
         return command.get(timeout, TimeUnit.MILLISECONDS);
     }
 
+    /**
+     * getBestMove()
+     * 
+     * Gets the best move given a FEN board state.
+     * 
+     * @param fen
+     * @return
+     * @throws InterruptedException
+     * @throws ExecutionException
+     * @throws TimeoutException
+     * @author Evan Delanty
+     */
     public String getBestMove(String fen) throws InterruptedException, ExecutionException, TimeoutException {
         command("position fen " + fen, Function.identity(), s -> s.startsWith("readyok"), 2000l);
         String bestMove = command(
