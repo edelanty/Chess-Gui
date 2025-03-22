@@ -3,6 +3,8 @@ package com.evan.p2pChess.Gui;
 import javax.swing.*;
 
 import com.evan.p2pChess.Game;
+import com.evan.p2pChess.Gamemode;
+import com.evan.p2pChess.Uci;
 
 import java.awt.*;
 
@@ -11,26 +13,32 @@ public class Gui {
     private CardLayout cardLayout;
     private JPanel mainPanel;
     private Game game;
+    private Uci uci;
 
-    public Gui() {
+    public Gui(Uci uci) {
         this.mainWindowFrame = new JFrame("P2P Chess");
         this.mainWindowFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.mainWindowFrame.setBackground(Color.WHITE);
         this.cardLayout = new CardLayout();
         this.mainPanel = new JPanel(cardLayout);
         this.game = null;
+        this.uci = uci;
     }
 
     private void setupGui() {
         StartScreen startScreen = new StartScreen(cardLayout, mainPanel);
         Settings settings = new Settings(cardLayout, mainPanel);
-        P2PChess p2pChess = new P2PChess(cardLayout, mainPanel, settings, game);
+        P2PChess p2pChess = new P2PChess(cardLayout, mainPanel, settings, game, Gamemode.HUMAN_VS_HUMAN, uci);
+        P2PChess ai2pChess = new P2PChess(cardLayout, mainPanel, settings, game, Gamemode.HUMAN_VS_AI, uci);
         startScreen.runGUI();
         p2pChess.runGui();
+        ai2pChess.runGui();
         settings.runGUI();
         settings.setP2pChess(p2pChess);
+        settings.setAi2PChess(ai2pChess);
 
         mainPanel.add(startScreen.getStartScreenPanel(), "Start Screen");
+        mainPanel.add(ai2pChess.getChessBoardPanel(), "AI2P Chess");
         mainPanel.add(p2pChess.getChessBoardPanel(), "P2P Chess");
         mainPanel.add(settings.getSettingsPanel(), "Settings");
 

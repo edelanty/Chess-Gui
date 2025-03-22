@@ -100,6 +100,21 @@ public abstract class Piece implements Movement {
         return symbol;
     }
 
+    public String getFenSymbol() {
+        String symbol = "";
+
+        switch (this.getPieceName()) {
+            case "Pawn": symbol = this.getPieceColor() == Color.WHITE ? "P" : "p"; break;
+            case "Rook": symbol = this.getPieceColor() == Color.WHITE ? "R" : "r"; break;
+            case "Knight": symbol = this.getPieceColor() == Color.WHITE ? "N" : "n"; break;
+            case "Bishop": symbol = this.getPieceColor() == Color.WHITE ? "B" : "b"; break;
+            case "Queen": symbol = this.getPieceColor() == Color.WHITE ? "Q" : "q"; break;
+            case "King": symbol = this.getPieceColor() == Color.WHITE ? "K" : "k"; break;
+        }
+
+        return symbol;
+    }
+
     private String getPieceImageKey() {
         String color = this.getPieceColor() == Color.WHITE ? "white" : "black";
         String name = this.getPieceName().toLowerCase();

@@ -16,15 +16,18 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.swing.BorderFactory;
-import javax.swing.*;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -33,8 +36,11 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
 import com.evan.p2pChess.Board;
+import com.evan.p2pChess.FenGenerator;
 import com.evan.p2pChess.Game;
+import com.evan.p2pChess.Gamemode;
 import com.evan.p2pChess.Player;
+import com.evan.p2pChess.Uci;
 import com.evan.p2pChess.Pieces.Piece;
 
 public class P2PChess {
@@ -79,12 +85,17 @@ public class P2PChess {
     private Map<String, Integer> whiteCapturedPieces;
     private Map<String, Integer> blackCapturedPieces;
 
+    private Gamemode gamemode;
+    private Uci uci;
+    private FenGenerator fenGen;
+    private String fenString;
+
     private static final int PIECE_SIZE = 50;
     private static final int MOVE_NUMBER_COLUMN_SIZE = 30;
     private static final int WHITE_MOVE_COLUMN_SIZE = 60;
     private static final int BLACK_MOVE_COLUMN_SIZE = 60;
 
-    public P2PChess(CardLayout cardLayout, JPanel mainPanel, Settings settings, Game game) {
+    public P2PChess(CardLayout cardLayout, JPanel mainPanel, Settings settings, Game game, Gamemode gamemode, Uci uci) {
         this.mainPanel = mainPanel;
         this.cardLayout = cardLayout;
         this.chessBoardPanel = new JPanel(new BorderLayout());
@@ -113,6 +124,10 @@ public class P2PChess {
         this.hasFirstMove = false;
         this.blackTimerLabel = new JLabel();
         this.whiteTimerLabel = new JLabel();
+        this.gamemode = gamemode;
+        this.fenString = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"; //Default position
+        this.uci = uci;
+        this.fenGen = new FenGenerator();
     }
     
     //Getters
@@ -530,6 +545,10 @@ public class P2PChess {
             resetHighlightedTiles();
             selectedRow = -1;
             selectedCol = -1;
+
+            if (gamemode == Gamemode.HUMAN_VS_AI && !whiteTurn) { //If it's the AI's turn after a successful human move
+                playAIMove();
+            }
         }
     }
 
@@ -538,10 +557,10 @@ public class P2PChess {
      * 
      * Checks for a capture, plays a sound, invokes move, updates display for potential captures or history, and switches turns.
      * 
-     * @param selectedPiece
-     * @param destinationPiece
-     * @param row
-     * @param col
+     * @param selectedPiece Piece moving from
+     * @param destinationPiece Piece moving to
+     * @param row Row moving to
+     * @param col Col moving to
      */
     private void handleSuccessfulMoves(Piece selectedPiece, Piece destinationPiece, int row, int col) {
         if (selectedPiece != null && selectedPiece.isValidMove(row, col, board)) { //Executed after successful move
@@ -559,9 +578,100 @@ public class P2PChess {
             //Switch turn logic
             whiteTurn = !whiteTurn;
             game.switchTurns(whiteTurn);
+            fenString = fenGen.generateFEN(board, whiteTurn, moveNumber);
         } else { //If not a valid move shake the piece around
             invalidMoveFeedback(selectedRow, selectedCol);
         }
+    }
+
+    private void playAIMove() {
+        //Create and start a new thread for AI move calculation
+        new Thread(() -> {
+            try {
+                //Step 1: Get best move from engine (this is the time-consuming part)
+                final String bestMove = uci.getBestMove(fenString);
+                
+                // Once we have the move, we need to update the UI on the EDT
+                SwingUtilities.invokeLater(() -> {
+                    try {
+                        if (bestMove == null || bestMove.length() < 4) {
+                            // Handle case where no valid move was returned
+                            JOptionPane.showMessageDialog(null, 
+                                "Engine couldn't find a valid move.", 
+                                "AI Error", 
+                                JOptionPane.WARNING_MESSAGE);
+                            return;
+                        }
+                        
+                        //Parse move
+                        int fromCol = bestMove.charAt(0) - 'a';
+                        int fromRow = 8 - Character.getNumericValue(bestMove.charAt(1));
+                        int toCol = bestMove.charAt(2) - 'a';
+                        int toRow = 8 - Character.getNumericValue(bestMove.charAt(3));
+                        
+                        //Validate the move coordinates
+                        if (fromRow < 0 || fromRow >= 8 || fromCol < 0 || fromCol >= 8 ||
+                            toRow < 0 || toRow >= 8 || toCol < 0 || toCol >= 8) {
+                            JOptionPane.showMessageDialog(null, 
+                                "Engine returned invalid move coordinates: " + bestMove, 
+                                "AI Error", 
+                                JOptionPane.WARNING_MESSAGE);
+                            return;
+                        }
+                        
+                        Piece piece = board.getPieceAt(fromRow, fromCol);
+                        
+                        if (piece == null) {
+                            JOptionPane.showMessageDialog(null, 
+                                "No piece found at position: " + bestMove.substring(0, 2), 
+                                "AI Error", 
+                                JOptionPane.WARNING_MESSAGE);
+                            return;
+                        }
+                        
+                        Piece destinationPiece = board.getPieceAt(toRow, toCol);
+                        
+                        //Save previous position for move history display
+                        int prevRow = piece.getPieceRow();
+                        int prevCol = piece.getPieceCol();
+                        
+                        //Move the piece
+                        piece.move(toRow, toCol, board);
+                        
+                        //Update the GUI
+                        refreshBoardDisplay();
+                        updateMoveListDisplay(piece, prevRow, prevCol, toRow, toCol);
+
+                        //Play sound
+                        if (!checkForCapture(destinationPiece, piece)) {
+                            board.playPieceMovingSound();
+                        }
+                        
+                        //Switch turn logic
+                        whiteTurn = !whiteTurn;
+                        game.switchTurns(whiteTurn);
+                        fenString = fenGen.generateFEN(board, whiteTurn, moveNumber);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        JOptionPane.showMessageDialog(null, 
+                            "Error executing AI move: " + e.getMessage(), 
+                            "AI Error", 
+                            JOptionPane.ERROR_MESSAGE);
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+                
+                //Show error on EDT
+                SwingUtilities.invokeLater(() -> {
+                    //Show error dialog to user
+                    JOptionPane.showMessageDialog(null, 
+                        "Error calculating AI move: " + e.getMessage(), 
+                        "AI Error", 
+                        JOptionPane.ERROR_MESSAGE);
+                });
+            }
+        }).start();
     }
 
     /*
@@ -628,6 +738,10 @@ public class P2PChess {
      */
     private boolean isCorrectTurn(Piece piece) {
         boolean isCorrectTurn;
+
+        if (gamemode == Gamemode.HUMAN_VS_AI && !whiteTurn) {
+            return false;
+        }
 
         if (piece.getPieceColor() == com.evan.p2pChess.Color.WHITE && whiteTurn) {
             isCorrectTurn = true;

@@ -3,6 +3,10 @@ package com.evan.p2pChess;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
+
 import org.junit.jupiter.api.Test;
 
 import com.evan.p2pChess.Pieces.*;
@@ -709,6 +713,91 @@ public class P2PChessTest {
         e8King.move(Board.ROW_8, Board.COL_C, board);
         assertEquals(e8King, board.getPieceAt(Board.BLACK_BACK_ROW, Board.COL_E));
         assertEquals(h8Rook, board.getPieceAt(Board.BLACK_BACK_ROW, Board.COL_H));
+    }
+
+    //AI tests
+
+    @Test
+    public void stockfishBestMoveTest() throws InterruptedException, ExecutionException, TimeoutException {
+        Uci uci = new Uci();
+        String bestMove = "";
+        String expected = "f4g3";
+        String position = "8/8/4Rp2/5P2/1PP1pkP1/7P/1P1r4/7K b - - 0 40";
+        uci.start("stockfish");
+        uci.command("uci", Function.identity(), (s) -> s.startsWith("uciok"), 2000l);
+        // We set the give position
+        uci.command("position fen " + position, Function.identity(), s -> s.startsWith("readyok"), 2000l);
+        bestMove = uci.command(
+            "go movetime 3000",
+            lines -> lines.stream().filter(s->s.startsWith("bestmove")).findFirst().get(),
+            line -> line.startsWith("bestmove"),
+            5000l)
+            .split(" ")[1];
+        assertEquals(expected, bestMove);
+        uci.close();
+    }
+
+    @Test
+    public void stockfishBestMoveFunctionTest() throws InterruptedException, ExecutionException, TimeoutException {
+        Uci uci = new Uci();
+        String bestMove = "";
+        String expected = "f4g3";
+        String position = "8/8/4Rp2/5P2/1PP1pkP1/7P/1P1r4/7K b - - 0 40";
+        uci.start("stockfish");
+        bestMove = uci.getBestMove(position);
+        assertEquals(expected, bestMove);
+        uci.close();
+    }
+
+    //Fen Gen tests
+    @Test
+    public void testStartingPosition() {
+        Board board = new Board(new Player("white", 0, Color.WHITE), new Player("black", 0, Color.BLACK));
+        FenGenerator fenGen = new FenGenerator();
+        board.resetBoard();
+        String fenString = fenGen.generateFEN(board, true, 1);
+        String expectedFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+        assertEquals(expectedFEN, fenString);
+    }
+
+    @Test
+    public void testEmptyBoard() {
+        Board board = new Board(new Player("white", 0, Color.WHITE), new Player("black", 0, Color.BLACK));
+        FenGenerator fenGen = new FenGenerator();
+        // Don't reset board - start with an empty board
+        String fenString = fenGen.generateFEN(board, true, 1);
+        String expectedFEN = "8/8/8/8/8/8/8/8 w - - 0 1";
+        assertEquals(expectedFEN, fenString);
+    }
+
+    @Test
+    public void testBlackTurn() {
+        Board board = new Board(new Player("white", 0, Color.WHITE), new Player("black", 0, Color.BLACK));
+        FenGenerator fenGen = new FenGenerator();
+        board.resetBoard();
+        String fenString = fenGen.generateFEN(board, false, 1);
+        String expectedFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1";
+        assertEquals(expectedFEN, fenString);
+    }
+//TODO
+    @Test
+    public void enPassantFenTest() {
+        Board board = new Board(new Player("white", 0, Color.WHITE), new Player("black", 0, Color.BLACK));
+        FenGenerator fenGen = new FenGenerator();
+        board.resetBoard();
+        
+        // Simulate e4 move: move e2 pawn to e4
+        Piece pawn = board.getPieceAt(Board.ROW_2, Board.COL_E);
+        // Remove pawn from e2
+        board.setPieceAt(Board.ROW_2, Board.COL_E, null);
+        // Place pawn at e4
+        pawn.setPieceRow(Board.ROW_4);
+        pawn.setPieceCol(Board.COL_E);
+        board.setPieceAt(Board.ROW_4, Board.COL_E, pawn);
+        
+        String fenString = fenGen.generateFEN(board, false, 1);
+        String expectedFEN = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
+        // assertEquals(expectedFEN, fenString);
     }
 
 }

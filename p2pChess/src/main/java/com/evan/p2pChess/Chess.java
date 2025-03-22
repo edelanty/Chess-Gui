@@ -2,7 +2,10 @@ package com.evan.p2pChess;
 
 public class Chess {
     public static void main(String[] args) {
-        Game game = new Game();
+        Uci uci = new Uci();
+        uci.start("stockfish");
+        Game game = new Game(uci);
         game.gameStart();
+        // uci.close();
     }
 }

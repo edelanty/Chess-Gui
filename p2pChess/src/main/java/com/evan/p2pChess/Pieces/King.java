@@ -36,6 +36,37 @@ public class King extends Piece {
         this.hasMoved = hasMoved;
     }
 
+    /**
+     * Determines if the king has castling rights for FEN notation purposes.
+     * This only checks if the king and relevant rook have maintained their eligibility
+     * (have not moved), not whether castling is immediately possible.
+     * 
+     * @param kingside true for kingside castling, false for queenside castling
+     * @param board the current game board
+     * @return true if the king has castling rights with the specified rook
+     */
+    public boolean canFenCastle(boolean kingside, Board board) {
+        //If the king has moved, no castling rights
+        if (hasMoved) {
+            return false;
+        }
+        
+        //Determine which rook to check
+        int rookCol = kingside ? Board.COL_H : Board.COL_A;
+        int rookRow = this.getPieceRow(); // Same row as king
+        
+        //Get the rook
+        Piece rook = board.getPieceAt(rookRow, rookCol);
+        
+        //Check if rook exists, is the right type, and hasn't moved
+        if (rook != null && rook instanceof Rook && rook.getPieceColor() == this.getPieceColor()) {
+            Rook rookPiece = (Rook) rook;
+            return !rookPiece.getHasMoved();
+        }
+        
+        return false;
+    }
+
     public boolean isKingInCheck(Integer newRow, Integer newCol, Board board) {
         boolean isKingChecked = false;
         
@@ -82,7 +113,7 @@ public class King extends Piece {
         }
     }
 
-    private boolean canCastle(Integer newRow, Integer newCol, Board board) {
+    public boolean canCastle(Integer newRow, Integer newCol, Board board) {
         int direction = (newCol > getPieceCol()) ? 1 : -1; //1 for kingside, -1 for queenside
 
         //Ensure the King is not in check

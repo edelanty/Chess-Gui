@@ -121,7 +121,7 @@ public class StartScreen {
             @Override
             public void actionPerformed(ActionEvent e) {
                 SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/select.wav"));
-                cardLayout.show(mainPanel, "P2P Chess AI");
+                cardLayout.show(mainPanel, "AI2P Chess");
             }
         });
 
