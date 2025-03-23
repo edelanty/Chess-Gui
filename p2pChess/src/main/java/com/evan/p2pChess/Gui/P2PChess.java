@@ -584,6 +584,7 @@ public class P2PChess {
         }
     }
 
+    //TODO fix 
     private void playAIMove() {
         //Create and start a new thread for AI move calculation
         new Thread(() -> {
@@ -650,7 +651,6 @@ public class P2PChess {
                         //Switch turn logic
                         whiteTurn = !whiteTurn;
                         game.switchTurns(whiteTurn);
-                        fenString = fenGen.generateFEN(board, whiteTurn, moveNumber);
                     } catch (Exception e) {
                         e.printStackTrace();
                         JOptionPane.showMessageDialog(null, 
@@ -1171,9 +1171,38 @@ public class P2PChess {
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //TODO
+                if (!hasFirstMove) { //Don't do anything if timers haven't begun
+                    return;
+                }
+
+                if (gamemode == Gamemode.HUMAN_VS_AI && !whiteTurn) { //Can't resign for the AI
+                    return;
+                }
+
+                game.gameOver(); //Else just end the game
+                stopGame(whiteTurn);
             }
         });
+    }
+
+    private void stopGame(boolean whiteTurn) {
+        String message = whiteTurn ? "White Lost" : "Black Lost";
+        JOptionPane.showMessageDialog(null, message);
+        
+        int choice = JOptionPane.showConfirmDialog(null, 
+                    "Would you like to play again?", 
+                    "Game Over", 
+                    JOptionPane.YES_NO_OPTION);
+        
+        newGame();
+
+        if (choice == JOptionPane.NO_OPTION) {
+            cardLayout.show(mainPanel, "Start Screen");
+        }
+    }
+
+    private void newGame() {
+        //TODO make a new game
     }
 
 }

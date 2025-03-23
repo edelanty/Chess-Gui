@@ -81,7 +81,7 @@ public class Game {
             if (blackTimeSeconds <= 0) {
                 blackTimer.stop();
                 whiteTimer.stop();
-                showGameOver("White wins on time!");
+                gameOver();
             }
         });
 
@@ -91,7 +91,7 @@ public class Game {
             if (whiteTimeSeconds <= 0) {
                 whiteTimer.stop();
                 blackTimer.stop();
-                showGameOver("Black wins on time!");
+                gameOver();
             }
         });
 
@@ -193,15 +193,14 @@ public class Game {
     }
 
     /**
-     * showGameOver()
+     * gameOver()
      * 
-     * Displays a game over message and stops both clocks.
+     * Stops the clocks.
      * 
      */
-    public void showGameOver(String message) {
+    public void gameOver() {
         whiteTimer.stop();
         blackTimer.stop();
-        JOptionPane.showMessageDialog(null, message);
     }
 
     /**
