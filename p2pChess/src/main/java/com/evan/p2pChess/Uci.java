@@ -3,7 +3,6 @@ package com.evan.p2pChess;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -15,8 +14,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 import java.util.function.Predicate;
-
-import java.net.URL;
 
 /**
  * Intended to communicate to the Universal Chess Interface (UCI) to find and play the best move's in the Play Against AI mode.
@@ -37,6 +34,12 @@ public class Uci {
         this.writer = null;
     }
 
+    /**
+     * 
+     * 
+     * @param cmd
+     * * @author Evan Delanty
+     */
     public void start(String cmd) {
         ProcessBuilder pb;
         if (System.getProperty("os.name").toLowerCase().contains("win")) { //Windows
@@ -56,9 +59,13 @@ public class Uci {
         }
     }
 
+    /**
+     * 
+     * * @author Andrei Ciobanu
+     */
     public void close() {
         if (this.process.isAlive()) {
-        this.process.destroy();
+            this.process.destroy();
         }
         try {
             reader.close();
@@ -68,7 +75,21 @@ public class Uci {
         }
     }
 
-    public <T> T command(String cmd, Function<List<String>, T> commandProcessor, Predicate<String> breakCondition, long timeout) throws InterruptedException, ExecutionException, TimeoutException {
+    /**
+     * 
+     * 
+     * @param <T>
+     * @param cmd
+     * @param commandProcessor
+     * @param breakCondition
+     * @param timeout
+     * @return
+     * @throws InterruptedException
+     * @throws ExecutionException
+     * @throws TimeoutException
+     * @author Andrei Ciobanu
+     */
+    public <T>T command(String cmd, Function<List<String>, T> commandProcessor, Predicate<String> breakCondition, long timeout) throws InterruptedException, ExecutionException, TimeoutException {
         // This completable future will send a command to the process
         // And gather all the output of the engine in the List<String>
         // At the end, the List<String> is translated to T through the
