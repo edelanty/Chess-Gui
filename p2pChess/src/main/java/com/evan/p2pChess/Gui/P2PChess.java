@@ -89,6 +89,7 @@ public class P2PChess {
     private Uci uci;
     private FenGenerator fenGen;
     private String fenString;
+    private com.evan.p2pChess.Color playerColor;
 
     private static final int PIECE_SIZE = 50;
     private static final int MOVE_NUMBER_COLUMN_SIZE = 30;
@@ -128,6 +129,7 @@ public class P2PChess {
         this.fenString = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"; //Default position
         this.uci = uci;
         this.fenGen = new FenGenerator();
+        this.playerColor = null;
     }
     
     //Getters
@@ -146,6 +148,10 @@ public class P2PChess {
 
     public void setBlackTimerLabel(String timeSetting) {
         blackTimerLabel.setText("Black: " + timeSetting + ":00");
+    }
+
+    public void setPlayerColor(com.evan.p2pChess.Color playerColor) {
+        this.playerColor = playerColor;
     }
 
     /**
@@ -546,7 +552,7 @@ public class P2PChess {
             selectedRow = -1;
             selectedCol = -1;
 
-            if (gamemode == Gamemode.HUMAN_VS_AI && !whiteTurn) { //If it's the AI's turn after a successful human move
+            if (gamemode == Gamemode.HUMAN_VS_AI && isAiTurn()) { //If it's the AI's turn after a successful human move
                 playAIMove();
             }
         }
@@ -584,8 +590,21 @@ public class P2PChess {
         }
     }
 
-    //TODO fix 
-    private void playAIMove() {
+    private boolean isAiTurn() {
+        boolean isAiTurn = false;
+
+        if (playerColor == com.evan.p2pChess.Color.WHITE && whiteTurn) {
+            isAiTurn = false;
+        } else if (playerColor == com.evan.p2pChess.Color.BLACK && !whiteTurn) {
+            isAiTurn = false;
+        } else {
+            isAiTurn = true;
+        }
+
+        return isAiTurn;
+    }
+
+    public void playAIMove() {
         //Create and start a new thread for AI move calculation
         new Thread(() -> {
             try {
@@ -642,6 +661,8 @@ public class P2PChess {
                         //Update the GUI
                         refreshBoardDisplay();
                         updateMoveListDisplay(piece, prevRow, prevCol, toRow, toCol);
+                        //Start the game clock if needed
+                        startGameClockIfFirstMove();
 
                         //Play sound
                         if (!checkForCapture(destinationPiece, piece)) {
@@ -737,21 +758,32 @@ public class P2PChess {
      * @return
      */
     private boolean isCorrectTurn(Piece piece) {
-        boolean isCorrectTurn;
-
-        if (gamemode == Gamemode.HUMAN_VS_AI && !whiteTurn) {
-            return false;
+        //Block interactions during AI's turn
+        if (gamemode == Gamemode.HUMAN_VS_AI) {
+            //Block interactions before first AI move when player is black
+            if (playerColor == com.evan.p2pChess.Color.BLACK && !hasFirstMove) {
+                return false;
+            }
+            
+            //Block interactions during AI's turn
+            if (isAiTurn()) {
+                return false;
+            }
         }
-
-        if (piece.getPieceColor() == com.evan.p2pChess.Color.WHITE && whiteTurn) {
-            isCorrectTurn = true;
-        } else if (piece.getPieceColor() == com.evan.p2pChess.Color.BLACK && !whiteTurn) {
-            isCorrectTurn = true;
-        } else {
-            isCorrectTurn = false;
+        
+        com.evan.p2pChess.Color pieceColor = piece.getPieceColor();
+        
+        //For human vs human mode
+        if (gamemode != Gamemode.HUMAN_VS_AI) {
+            return (pieceColor == com.evan.p2pChess.Color.WHITE && whiteTurn) || 
+                   (pieceColor == com.evan.p2pChess.Color.BLACK && !whiteTurn);
         }
-
-        return isCorrectTurn;
+        
+        //For human vs AI mode
+        //In this mode, player can only move their own color
+        return pieceColor == playerColor && 
+               ((playerColor == com.evan.p2pChess.Color.WHITE && whiteTurn) || 
+                (playerColor == com.evan.p2pChess.Color.BLACK && !whiteTurn));
     }
 
     /**
@@ -1175,7 +1207,7 @@ public class P2PChess {
                     return;
                 }
 
-                if (gamemode == Gamemode.HUMAN_VS_AI && !whiteTurn) { //Can't resign for the AI
+                if (gamemode == Gamemode.HUMAN_VS_AI && isAiTurn()) { //Can't resign for the AI
                     return;
                 }
 

@@ -14,15 +14,17 @@ public class Gui {
     private JPanel mainPanel;
     private Game game;
     private Uci uci;
+    private com.evan.p2pChess.Color playerColor;
 
-    public Gui(Uci uci) {
+    public Gui() {
         this.mainWindowFrame = new JFrame("P2P Chess");
         this.mainWindowFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.mainWindowFrame.setBackground(Color.WHITE);
         this.cardLayout = new CardLayout();
         this.mainPanel = new JPanel(cardLayout);
         this.game = null;
-        this.uci = uci;
+        this.uci = new Uci();
+        this.playerColor = com.evan.p2pChess.Color.WHITE;
     }
 
     private void setupGui() {
@@ -30,16 +32,20 @@ public class Gui {
         Settings settings = new Settings(cardLayout, mainPanel);
         P2PChess p2pChess = new P2PChess(cardLayout, mainPanel, settings, game, Gamemode.HUMAN_VS_HUMAN, uci);
         P2PChess ai2pChess = new P2PChess(cardLayout, mainPanel, settings, game, Gamemode.HUMAN_VS_AI, uci);
-        startScreen.runGUI();
+        PlayVsAI selectScreen = new PlayVsAI(cardLayout, mainPanel, uci, playerColor, ai2pChess);
+        startScreen.runGui();
+        selectScreen.runGui();
         p2pChess.runGui();
         ai2pChess.runGui();
-        settings.runGUI();
+        settings.runGui();
         settings.setP2pChess(p2pChess);
         settings.setAi2PChess(ai2pChess);
+        ai2pChess.setPlayerColor(playerColor);
 
         mainPanel.add(startScreen.getStartScreenPanel(), "Start Screen");
         mainPanel.add(ai2pChess.getChessBoardPanel(), "AI2P Chess");
         mainPanel.add(p2pChess.getChessBoardPanel(), "P2P Chess");
+        mainPanel.add(selectScreen.getAiPanel(), "AI Select Screen");
         mainPanel.add(settings.getSettingsPanel(), "Settings");
 
         //Add objects to the main window frame

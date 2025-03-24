@@ -24,6 +24,7 @@ public class StartScreen {
     private JButton playVsHumanButton;
     private JButton settingsButton;
     private CardLayout cardLayout;
+    private boolean hasAIGameStarted;
 
     public StartScreen(CardLayout cardLayout, JPanel mainPanel) {
         this.mainPanel = mainPanel;
@@ -43,13 +44,14 @@ public class StartScreen {
         this.playVsHumanButton = new JButton("Play vs Human");
         this.settingsButton = new JButton("Settings");
         this.cardLayout = cardLayout;
+        this.hasAIGameStarted = false;
     }
 
     public JPanel getStartScreenPanel() {
         return startScreenPanel;
     }
 
-    private void setupGUI() {
+    private void setupGui() {
         startScreenPanel.setLayout(new BorderLayout());
         startScreenPanel.setPreferredSize(new Dimension(1000, 750));
         startScreenPanel.add(BorderLayout.NORTH, titlePanel());
@@ -111,8 +113,8 @@ public class StartScreen {
         button.setBorder(BorderFactory.createRaisedBevelBorder());
     }
 
-    public void runGUI() {
-        setupGUI();
+    public void runGui() {
+        setupGui();
         setupListeners();
     }
 
@@ -121,7 +123,12 @@ public class StartScreen {
             @Override
             public void actionPerformed(ActionEvent e) {
                 SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/select.wav"));
-                cardLayout.show(mainPanel, "AI2P Chess");
+                if (!hasAIGameStarted) {
+                    cardLayout.show(mainPanel, "AI Select Screen");
+                    hasAIGameStarted = true;
+                } else {
+                    cardLayout.show(mainPanel, "AI2P Chess");
+                }
             }
         });
 

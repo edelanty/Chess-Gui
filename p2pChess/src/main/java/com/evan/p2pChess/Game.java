@@ -8,7 +8,6 @@ import com.evan.p2pChess.Gui.Settings;
 public class Game {
     private Integer gameTime;
     private Integer gameWinner;
-    private Uci uci;
 
     private Timer blackTimer;
     private Timer whiteTimer;
@@ -18,10 +17,9 @@ public class Game {
     private JLabel blackTimerLabel;
     private JLabel whiteTimerLabel;
 
-    public Game(Uci uci) {
+    public Game() {
         this.gameTime = 0;
         this.gameWinner = 0;
-        this.uci = uci;
     }
 
     //Getters
@@ -58,7 +56,7 @@ public class Game {
      * 
      */
     public void gameStart() {
-        Gui gui = new Gui(uci);
+        Gui gui = new Gui();
         gui.runGui(this);
     }
 

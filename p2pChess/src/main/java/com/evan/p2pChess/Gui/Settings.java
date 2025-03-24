@@ -137,12 +137,12 @@ public class Settings {
         this.timeSelection = timeSelection;
     }
 
-    public void runGUI() {
-        setupGUI();
+    public void runGui() {
+        setupGui();
         setupListeners();
     }
 
-    private void setupGUI() {
+    private void setupGui() {
         settingsPanel.setLayout(new BorderLayout());
         settingsPanel.setPreferredSize(new Dimension(1000, 750));
 

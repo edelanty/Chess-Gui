@@ -148,4 +148,21 @@ public class Uci {
         return bestMove;
     }
 
+    /**
+     * setAIDifficulty()
+     * 
+     * Allows the engine to be dumbed down depending on the option selected.
+     * 
+     * @param elo
+     */
+    public void setAIDifficulty(int elo) {
+        try {
+            writer.write("setoption name UCI_LimitStrength value true\n");
+            writer.write("setoption name UCI_Elo value " + elo + "\n");
+            writer.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
