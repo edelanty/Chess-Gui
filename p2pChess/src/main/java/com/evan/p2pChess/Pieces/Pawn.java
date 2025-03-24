@@ -1,9 +1,12 @@
 package com.evan.p2pChess.Pieces;
 
+import java.awt.Point;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.evan.p2pChess.Board;
 import com.evan.p2pChess.Color;
 import com.evan.p2pChess.Player;
-import com.evan.p2pChess.Gui.P2PChess;
 
 /**
  * Contains all the functionality for the Pawn piece in a classic game of chess. This class inherits from the Piece class in order
@@ -35,30 +38,33 @@ public class Pawn extends Piece {
         this.hasMoved = hasMoved;
     }
 
-    public void drawPossiblePieceMoves(P2PChess gui, Board board) {
-        Integer curRow = this.getPieceRow();
-        Integer curCol = this.getPieceCol();
-        Integer newRow = curRow + direction;
+    @Override
+    public List<Point> getLegalMoves(Board board) {
+        List<Point> legalMoves = new ArrayList<>();
+        int curRow = getPieceRow();
+        int curCol = getPieceCol();
+        int newRow = curRow + direction;
         Integer newCol = null;
 
-        //Single move or double move upwards highlighting
+        //Single move or double move forward
         if (newRow >= 0 && newRow < Board.BOARD_SIZE) {
             if (isValidMove(newRow, curCol, board)) {
-                gui.moveHighlightTile(pieceColor, newRow, curCol);
+                legalMoves.add(new Point(newRow, curCol));
 
+                //Double move from starting position
                 if (!hasMoved) {
                     newRow = curRow + (2 * direction);
 
                     if (newRow >= 0 && newRow < Board.BOARD_SIZE) {
                         if (isValidMove(newRow, curCol, board)) {
-                            gui.moveHighlightTile(pieceColor, newRow, curCol);
+                            legalMoves.add(new Point(newRow, curCol));
                         }
                     }
                 }
             }
         }
 
-        //Diagonal capture highlighting
+        //Diagonal capture moves
         int[] captureColOffsets = {-1, 1};
 
         for (int colOffset : captureColOffsets) {
@@ -68,14 +74,15 @@ public class Pawn extends Piece {
             if (newRow >= 0 && newRow < Board.BOARD_SIZE && newCol >= 0 && newCol < Board.BOARD_SIZE) {
                 Piece target = board.getPieceAt(newRow, newCol);
 
-                if (target != null && target.getPieceColor() != pieceColor) { //If there's a piece and it's the opposing color
-                    gui.moveHighlightTile(pieceColor, newRow, newCol);
+                if (target != null && target.getPieceColor() != pieceColor) {
+                    legalMoves.add(new Point(newRow, curCol));
                 }
             }
 
-            //Add en passant highlighting TODO
+            //TODO: Add en passant logic here when implementing that feature
         }
 
+        return legalMoves;
     }
 
     @Override
@@ -127,9 +134,40 @@ public class Pawn extends Piece {
 
             //Update board with new piece position
             board.setPieceAt(newRow, newCol, this);
+
+            checkForPromotion(board);
         } else {
             System.out.println("Invalid Move"); 
         }
     }
+    //TODO
+    /**
+     * checkForPromotion()
+     * 
+     * Checks if a given pawn can promote, gives an option between the Queen, Knight, Rook, and Bishop.
+     * 
+     * @param board
+     */
+    private void checkForPromotion(Board board) {
+        Integer curRow = this.getPieceRow();
+        Integer curCol = this.getPieceCol();
+        Color currentColor = this.pieceColor;
+        Color oppositeColor = (Color.WHITE == currentColor) ? Color.BLACK : Color.WHITE;
+
+        if (oppositeColor == Color.BLACK && curRow == Board.BLACK_BACK_ROW) { //Prompt for promotion
+            promotePiece();
+            return;    
+        }
+
+        if (oppositeColor == Color.WHITE && curRow == Board.WHITE_BACK_ROW) {
+            promotePiece();
+            return;
+        }
+    }
+
+    private void promotePiece() {
+
+    }
+
     //TODO code en passant
 }

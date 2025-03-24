@@ -1,9 +1,12 @@
 package com.evan.p2pChess.Pieces;
 
+import java.awt.Point;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.evan.p2pChess.Board;
 import com.evan.p2pChess.Color;
 import com.evan.p2pChess.Player;
-import com.evan.p2pChess.Gui.P2PChess;
 
 /**
  * Contains all the functionality for the King piece in a classic game of chess. This class inherits from the Piece class in order
@@ -53,7 +56,7 @@ public class King extends Piece {
         
         //Determine which rook to check
         int rookCol = kingside ? Board.COL_H : Board.COL_A;
-        int rookRow = this.getPieceRow(); // Same row as king
+        int rookRow = this.getPieceRow(); //Same row as king
         
         //Get the rook
         Piece rook = board.getPieceAt(rookRow, rookCol);
@@ -89,28 +92,6 @@ public class King extends Piece {
         }
 
         return isKingChecked;
-    }
-
-    public void drawPossiblePieceMoves(P2PChess gui, Board board) {
-        Integer curRow = this.getPieceRow();
-        Integer curCol = this.getPieceCol();
-        
-        int[][] kingDirections = {
-            {-1, -1}, {-1, 0}, {-1, 1},
-            {0, -1},           {0, 1},
-            {1, -1},  {1, 0},  {1, 1}
-        };
-        
-        for (int[] dir : kingDirections) {
-            int newRow = curRow + dir[0];
-            int newCol = curCol + dir[1];
-            
-            if (newRow >= 0 && newRow < Board.BOARD_SIZE && newCol >= 0 && newCol < Board.BOARD_SIZE) {
-                if (isValidMove(newRow, newCol, board)) {
-                    gui.moveHighlightTile(this.getPieceColor(), newRow, newCol);
-                }
-            }
-        }
     }
 
     public boolean canCastle(Integer newRow, Integer newCol, Board board) {
@@ -175,6 +156,45 @@ public class King extends Piece {
 
         return newCol == Board.COL_G || newCol == Board.COL_C;
     }
+
+    @Override
+    public List<Point> getLegalMoves(Board board) {
+        List<Point> legalMoves = new ArrayList<>();
+        int curRow = getPieceRow();
+        int curCol = getPieceCol();
+    
+        int[][] directions = {
+            {-1, -1}, {-1, 0}, {-1, 1},
+            { 0, -1},          { 0, 1},
+            { 1, -1}, { 1, 0}, { 1, 1}
+        };
+    
+        for (int[] dir : directions) {
+            int newRow = curRow + dir[0];
+            int newCol = curCol + dir[1];
+    
+            if (newRow >= 0 && newRow < Board.BOARD_SIZE && newCol >= 0 && newCol < Board.BOARD_SIZE) {
+                if (isValidMove(newRow, newCol, board)) {
+                    legalMoves.add(new Point(newRow, newCol));
+                }
+            }
+        }
+    
+        // Add castling moves if king hasn't moved and isn't in check
+        if (!hasMoved && !isChecked) {
+            // Kingside castling (column G)
+            if (isValidMove(curRow, Board.COL_G, board)) {
+                legalMoves.add(new Point(curRow, Board.COL_G));
+            }
+    
+            // Queenside castling (column C)
+            if (isValidMove(curRow, Board.COL_C, board)) {
+                legalMoves.add(new Point(curRow, Board.COL_C));
+            }
+        }
+    
+        return legalMoves;
+    }    
 
     @Override
     public boolean isValidMove(Integer newRow, Integer newCol, Board board) {

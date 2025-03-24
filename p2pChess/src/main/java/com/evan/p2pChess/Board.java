@@ -121,6 +121,21 @@ public class Board {
         board[BLACK_BACK_ROW][4].setPiece(new King(new Integer[][]{{BLACK_BACK_ROW, COL_E}}, Color.BLACK, blackPlayer)); //Black king
     }
 
+    public void setDebugPieces() {
+        King g1King = new King(new Integer[][]{{Board.WHITE_BACK_ROW, Board.COL_G}}, Color.WHITE, whitePlayer);
+        Pawn f2Pawn = new Pawn(new Integer[][]{{Board.ROW_2, Board.COL_F}}, Color.WHITE, whitePlayer);
+        Pawn g2Pawn = new Pawn(new Integer[][]{{Board.ROW_2, Board.COL_G}}, Color.WHITE, whitePlayer);
+        Pawn h2Pawn = new Pawn(new Integer[][]{{Board.ROW_2, Board.COL_H}}, Color.WHITE, whitePlayer);
+        Rook a1Rook = new Rook(new Integer[][]{{Board.WHITE_BACK_ROW, Board.COL_A}}, Color.BLACK, blackPlayer);
+        
+        // Place pieces on the board
+        setPieceAt(g1King.getPieceRow(), g1King.getPieceCol(), g1King);
+        setPieceAt(f2Pawn.getPieceRow(), f2Pawn.getPieceCol(), f2Pawn);
+        setPieceAt(g2Pawn.getPieceRow(), g2Pawn.getPieceCol(), g2Pawn);
+        setPieceAt(h2Pawn.getPieceRow(), h2Pawn.getPieceCol(), h2Pawn);
+        setPieceAt(a1Rook.getPieceRow(), a1Rook.getPieceCol(), a1Rook);
+    }
+
     /**
      * printBoardToTerminal()
      * 

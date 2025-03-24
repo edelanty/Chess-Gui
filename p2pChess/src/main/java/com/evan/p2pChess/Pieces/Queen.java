@@ -1,9 +1,12 @@
 package com.evan.p2pChess.Pieces;
 
+import java.awt.Point;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.evan.p2pChess.Board;
 import com.evan.p2pChess.Color;
 import com.evan.p2pChess.Player;
-import com.evan.p2pChess.Gui.P2PChess;
 
 /**
  * Contains all the functionality for the Queen piece in a classic game of chess. This class inherits from the Piece class in order
@@ -21,10 +24,12 @@ public class Queen extends Piece {
         super(position, "Queen", 9, color, owner);
     }
 
-    public void drawPossiblePieceMoves(P2PChess gui, Board board) {
-        Integer curRow = this.getPieceRow();
-        Integer curCol = this.getPieceCol();
-
+    @Override
+    public List<Point> getLegalMoves(Board board) {
+        List<Point> legalMoves = new ArrayList<>();
+        int curRow = getPieceRow();
+        int curCol = getPieceCol();
+    
         int[][] directions = {
             {-1, 0}, {1, 0}, {0, -1}, {0, 1},
             {-1, -1}, {-1, 1}, {1, -1}, {1, 1}
@@ -44,7 +49,7 @@ public class Queen extends Piece {
                 if (newRow >= 0 && newRow < Board.BOARD_SIZE && newCol >= 0 && newCol < Board.BOARD_SIZE) {
                     //Use isValidMove to check if this is a valid position
                     if (isValidMove(newRow, newCol, board)) {
-                        gui.moveHighlightTile(pieceColor, newRow, newCol);
+                        legalMoves.add(new Point(newRow, newCol));
                     }
                     
                     //If there's a piece at this position (whether valid capture or not), we can't move further in this direction
@@ -56,6 +61,8 @@ public class Queen extends Piece {
                 }
             }
         }
+        
+        return legalMoves;
     }
 
     @Override

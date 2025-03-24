@@ -36,6 +36,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
 import com.evan.p2pChess.Board;
+import com.evan.p2pChess.CheckDetector;
 import com.evan.p2pChess.FenGenerator;
 import com.evan.p2pChess.Game;
 import com.evan.p2pChess.Gamemode;
@@ -90,6 +91,7 @@ public class P2PChess {
     private FenGenerator fenGen;
     private String fenString;
     private com.evan.p2pChess.Color playerColor;
+    private CheckDetector checkDetector;
 
     private static final int PIECE_SIZE = 50;
     private static final int MOVE_NUMBER_COLUMN_SIZE = 30;
@@ -130,6 +132,7 @@ public class P2PChess {
         this.uci = uci;
         this.fenGen = new FenGenerator();
         this.playerColor = null;
+        this.checkDetector = new CheckDetector(board);
     }
     
     //Getters
@@ -171,7 +174,8 @@ public class P2PChess {
      * 
      */
     private void setupGui() {
-        board.resetBoard();
+        // board.resetBoard();
+        board.setDebugPieces();
         chessBoardPanel.add(createChessBoardPanel(), BorderLayout.CENTER);
         chessBoardPanel.add(createMoveHistoryPanel(), BorderLayout.EAST);
         chessBoardPanel.add(createBlackCapturedPiecePanel(), BorderLayout.NORTH);
@@ -581,6 +585,8 @@ public class P2PChess {
             updateMoveListDisplay(selectedPiece, selectedRow, selectedCol, row, col);
             //Start the game clock if needed
             startGameClockIfFirstMove();
+            //Check for ending
+            checkForEndGame(selectedPiece);
             //Switch turn logic
             whiteTurn = !whiteTurn;
             game.switchTurns(whiteTurn);
@@ -588,6 +594,40 @@ public class P2PChess {
         } else { //If not a valid move shake the piece around
             invalidMoveFeedback(selectedRow, selectedCol);
         }
+    }
+
+    private void checkForEndGame(Piece currentPiece) {
+        com.evan.p2pChess.Color currentColor = currentPiece.getPieceColor();
+        com.evan.p2pChess.Color opponentColor = (currentColor == com.evan.p2pChess.Color.WHITE) ? com.evan.p2pChess.Color.BLACK : com.evan.p2pChess.Color.WHITE;
+        
+        if (checkDetector.isKingInCheck(opponentColor)) {
+            //Notify the player that the opponent is in check
+            notifyCheck();
+            
+            //Then check if it's checkmate
+            if (checkDetector.isCheckmate(opponentColor)) {
+                // Game over - current player wins
+                handleCheckmate();
+            }
+        } else {
+            //Check for stalemate
+            if (checkDetector.isStalemate(opponentColor)) {
+                //Game over - draw
+                handleStalemate();
+            }
+        }
+    }
+
+    private void notifyCheck() {
+        System.out.println("CHECK");
+    }
+
+    private void handleCheckmate() {
+        System.out.println("CHECKMATED");
+    }
+
+    private void handleStalemate() {
+        System.out.println("STALEMATED");
     }
 
     private boolean isAiTurn() {
@@ -668,7 +708,10 @@ public class P2PChess {
                         if (!checkForCapture(destinationPiece, piece)) {
                             board.playPieceMovingSound();
                         }
-                        
+
+                        //Check for end
+                        checkForEndGame(piece);
+
                         //Switch turn logic
                         whiteTurn = !whiteTurn;
                         game.switchTurns(whiteTurn);

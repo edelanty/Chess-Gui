@@ -1,7 +1,9 @@
 package com.evan.p2pChess.Pieces;
 
 import java.awt.Image;
+import java.awt.Point;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.ImageIcon;
@@ -71,12 +73,31 @@ public abstract class Piece implements Movement {
     }
 
     /**
+     * getLegalMoves()
+     * 
+     * Returns a list of all legal moves given a piece.
+     * 
+     * @param board
+     * @return
+     */
+    public abstract List<Point> getLegalMoves(Board board);
+
+    /**
      * drawPossiblePieceMoves()
      * 
      * Changes the color of tiles on the board where a piece could theoretically move unblocked.
      * 
      */
-    public abstract void drawPossiblePieceMoves(P2PChess gui, Board board); 
+    public void drawPossiblePieceMoves(P2PChess gui, Board board) {
+        List<Point> legalMoves = getLegalMoves(board);
+        
+        for (Point move : legalMoves) {
+            int newCol = move.x;
+            int newRow = move.y;
+
+            gui.moveHighlightTile(this.getPieceColor(), newRow, newCol);
+        }
+    }
 
     /**
      * getPieceSymbol()

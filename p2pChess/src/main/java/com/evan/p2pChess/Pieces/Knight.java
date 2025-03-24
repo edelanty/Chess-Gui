@@ -1,9 +1,12 @@
 package com.evan.p2pChess.Pieces;
 
+import java.awt.Point;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.evan.p2pChess.Board;
 import com.evan.p2pChess.Color;
 import com.evan.p2pChess.Player;
-import com.evan.p2pChess.Gui.P2PChess;
 
 /**
  * Contains all the functionality for the Knight piece in a classic game of chess. This class inherits from the Piece class in order
@@ -20,10 +23,12 @@ public class Knight extends Piece {
     public Knight(Integer[][] position, Color color, Player owner) {
         super(position, "Knight", 3, color, owner);
     }
-    
-    public void drawPossiblePieceMoves(P2PChess gui, Board board) {
-        Integer curRow = this.getPieceRow();
-        Integer curCol = this.getPieceCol();
+
+    @Override
+    public List<Point> getLegalMoves(Board board) {
+        List<Point> legalMoves = new ArrayList<>();
+        int curRow = getPieceRow();
+        int curCol = getPieceCol();
 
         int[][] knightMoves = {
             {-2, -1}, {-2, 1},
@@ -31,17 +36,19 @@ public class Knight extends Piece {
             {1, -2}, {1, 2},
             {2, -1}, {2, 1}
         };
-    
+
         for (int[] move : knightMoves) {
             int newRow = curRow + move[0];
             int newCol = curCol + move[1];
 
-            if (newRow >= 0 && newRow < Board.BOARD_SIZE && newCol >= 0 && newCol < Board.BOARD_SIZE) { //If the indices are in the bounds of our array
-                if (isValidMove(newRow, newCol, board)) { //Check for a valid move at the possible new positions
-                    gui.moveHighlightTile(this.getPieceColor(), newRow, newCol); //Highlight the pieces that are valid at the position
+            if (newRow >= 0 && newRow < Board.BOARD_SIZE && newCol >= 0 && newCol < Board.BOARD_SIZE) {
+                if (isValidMove(newRow, newCol, board)) {
+                    legalMoves.add(new Point(newRow, newCol));
                 }
             }
         }
+
+        return legalMoves;
     }
 
     @Override
@@ -96,5 +103,5 @@ public class Knight extends Piece {
             System.out.println("Invalid Move"); 
         }
     }
-    
+
 }

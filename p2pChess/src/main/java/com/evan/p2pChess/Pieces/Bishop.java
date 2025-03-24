@@ -1,9 +1,12 @@
 package com.evan.p2pChess.Pieces;
 
+import java.awt.Point;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.evan.p2pChess.Board;
 import com.evan.p2pChess.Color;
 import com.evan.p2pChess.Player;
-import com.evan.p2pChess.Gui.P2PChess;
 
 /**
  * Contains all the functionality for the Bishop piece in a classic game of chess. This class inherits from the Piece class in order
@@ -21,39 +24,45 @@ public class Bishop extends Piece {
         super(position, "Bishop", 3, color, owner);
     }
 
-    public void drawPossiblePieceMoves(P2PChess gui, Board board) {
-        Integer curRow = this.getPieceRow();
-        Integer curCol = this.getPieceCol();
+    @Override
+    public List<Point> getLegalMoves(Board board) {
+        List<Point> legalMoves = new ArrayList<>();
+        int curRow = getPieceRow();
+        int curCol = getPieceCol();
         
-        //Define the diagonal directions a bishop can move
+        // Define the diagonal directions a bishop can move
         int[][] diagonalDirections = {
             {-1, -1}, {-1, 1}, {1, -1}, {1, 1}
         };
         
-        //Check all possible positions in each direction
+        // Check all possible positions in each direction
         for (int[] dir : diagonalDirections) {
             int rowDir = dir[0];
             int colDir = dir[1];
             
-            //A bishop can move any number of squares diagonally (until edge or blocked)
+            // A bishop can move any number of squares diagonally (until edge or blocked)
             for (int distance = 1; distance < Board.BOARD_SIZE; distance++) {
                 int newRow = curRow + (rowDir * distance);
                 int newCol = curCol + (colDir * distance);
                 
+                // Check if the position is on the board
                 if (newRow >= 0 && newRow < Board.BOARD_SIZE && newCol >= 0 && newCol < Board.BOARD_SIZE) {
+                    // If it's a valid move, add to legal moves
                     if (isValidMove(newRow, newCol, board)) {
-                        gui.moveHighlightTile(pieceColor, newRow, newCol);
+                        legalMoves.add(new Point(newRow, newCol));
                     }
                     
-                    //If there's a piece at this position, we can't move further in this direction
+                    // If there's a piece at this position, we can't move further in this direction
                     if (board.getPieceAt(newRow, newCol) != null) {
                         break;
                     }
-                } else {                    
-                    break; //Position is off the board, stop checking in this direction
+                } else {
+                    break; // Position is off the board, stop checking in this direction
                 }
             }
         }
+        
+        return legalMoves;
     }
 
     @Override
@@ -103,5 +112,5 @@ public class Bishop extends Piece {
             System.out.println("Invalid Move"); 
         }
     }
-    
+
 }
