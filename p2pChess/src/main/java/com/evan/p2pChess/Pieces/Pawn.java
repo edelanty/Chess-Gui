@@ -116,8 +116,7 @@ public class Pawn extends Piece {
             isValidMove = true;
         }
         //Double move
-        else if (!getHasMoved() && newRow == curRow + (direction * 2) && newCol == curCol && 
-                 board.getPieceAt(curRow + direction, curCol) == null && board.getPieceAt(newRow, newCol) == null) {
+        else if (!getHasMoved() && newRow == curRow + (direction * 2) && newCol == curCol && board.getPieceAt(curRow + direction, curCol) == null && board.getPieceAt(newRow, newCol) == null) {
             isValidMove = true;
         }
         //Diagonal capture
@@ -161,6 +160,8 @@ public class Pawn extends Piece {
             //If a double move, set the possible enPassantSquare
             if (Math.abs(newRow - curRow) == 2) {
                 board.setEnPassantSquare(new Point(curRow + direction, curCol));
+            } else { //Reset so the FEN generator doesn't bug out
+                board.setEnPassantSquare(new Point(-1, -1));
             }
     
             //Update "hasMoved" after first move

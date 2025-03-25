@@ -58,7 +58,6 @@ public class CheckmateTest {
         board.setPieceAt(e2Pawn.getPieceRow(), e2Pawn.getPieceCol(), e2Pawn);
         board.setPieceAt(d2Pawn.getPieceRow(), d2Pawn.getPieceCol(), d2Pawn);
         board.setPieceAt(h2Pawn.getPieceRow(), h2Pawn.getPieceCol(), h2Pawn);
-        board.printBoardToTerminal();
         //Checkmate detection
         CheckDetector checkDetector = new CheckDetector(board);
         boolean isInCheck = checkDetector.isKingInCheck(Color.WHITE);
@@ -196,7 +195,6 @@ public class CheckmateTest {
         board.setPieceAt(f1Bishop.getPieceRow(), f1Bishop.getPieceCol(), null);
         f1Bishop = new Bishop(new Integer[][]{{Board.ROW_4, Board.COL_C}}, Color.WHITE, white);
         board.setPieceAt(f1Bishop.getPieceRow(), f1Bishop.getPieceCol(), f1Bishop);
-        board.printBoardToTerminal();
         //Create check detector
         CheckDetector checkDetector = new CheckDetector(board);
         //Check for checkmate

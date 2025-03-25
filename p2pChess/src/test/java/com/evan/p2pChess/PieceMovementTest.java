@@ -104,6 +104,7 @@ public class PieceMovementTest {
         Board board = new Board(white, new Player("black", 0, Color.BLACK));
         board.setPieceAt(e2Pawn.getPieceRow(), e2Pawn.getPieceCol(), e2Pawn);
         board.setPieceAt(d4Pawn.getPieceRow(), d4Pawn.getPieceCol(), d4Pawn);
+        e2Pawn.move(Board.ROW_4, Board.COL_E, board);
         d4Pawn.move(Board.ROW_3, Board.COL_E, board);
         assertEquals(null, board.getPieceAt(Board.ROW_4, Board.COL_E)); //Expect the e2 pawn to be gone (captured)
         assertEquals(d4Pawn, board.getPieceAt(Board.ROW_3, Board.COL_E)); //Expect black's d4 pawn to be at e3

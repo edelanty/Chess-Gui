@@ -45,7 +45,7 @@ public class Board {
 
     public Board(Player whitePlayer, Player blackPlayer) {
         this.board = new Tile[BOARD_SIZE][BOARD_SIZE];
-        this.enPassantSquare = new Point();
+        this.enPassantSquare = new Point(-1, -1);
         this.whitePlayer = whitePlayer;
         this.blackPlayer = blackPlayer;
 

@@ -135,8 +135,9 @@ public class PlayVsAI {
         buttonsRow.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         startGameButton = new JButton("Start Game");
-        startGameButton.setFont(new Font("Arial", Font.BOLD, 20));
-        startGameButton.setPreferredSize(new Dimension(200, 50));
+        startGameButton.setMaximumSize(new Dimension(300, 60));
+        startGameButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        startGameButton.setFont(new Font("Arial", Font.BOLD, 24));
         startGameButton.setBackground(Settings.WHITE_COLOR);
         startGameButton.setForeground(Color.BLACK);
         startGameButton.setFocusPainted(false);

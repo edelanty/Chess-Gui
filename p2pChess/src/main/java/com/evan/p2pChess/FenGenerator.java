@@ -1,5 +1,7 @@
 package com.evan.p2pChess;
 
+import java.awt.Point;
+
 import com.evan.p2pChess.Pieces.*;
 
 public class FenGenerator {
@@ -108,24 +110,25 @@ public class FenGenerator {
         }
     }
     
+    /**
+     * appendEnPassantTarget()
+     * 
+     * Checks for a possible enPassantSquare and puts it in the FEN string.
+     * 
+     * @param board
+     * @param fen
+     */
     private void appendEnPassantTarget(Board board, StringBuilder fen) {
-        // Check for potential en passant targets
-        // This assumes the Board class has a method to check for en passant possibility
-        // If not available, simply use "-"
-        fen.append(" -");
+        Point enPassantSquare = board.getEnPassantSquare();
         
-        // If your Board class tracks the last move and you can determine if a pawn
-        // moved two squares, you could implement logic here to set the en passant target
-        // Example:
-        /*
-        if (board.hasEnPassantTarget()) {
-            Position enPassantPos = board.getEnPassantTarget();
-            char file = (char) ('a' + enPassantPos.getCol());
-            int rank = 8 - enPassantPos.getRow();
+        //Check if en passant square is actually set
+        if (enPassantSquare != null && (enPassantSquare.x >= 0 && enPassantSquare.x < Board.BOARD_SIZE) && (enPassantSquare.y >= 0 && enPassantSquare.y < Board.BOARD_SIZE)) {
+            char file = (char) ('a' + enPassantSquare.y);
+            int rank = 8 - enPassantSquare.x;
             fen.append(" ").append(file).append(rank);
         } else {
             fen.append(" -");
         }
-        */
     }
+
 }
