@@ -1,17 +1,29 @@
 package com.evan.p2pChess.Pieces;
 
+import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import java.awt.event.MouseEvent;
 
 import com.evan.p2pChess.Board;
 import com.evan.p2pChess.Color;
 import com.evan.p2pChess.Player;
+import com.evan.p2pChess.SoundManager;
 import com.evan.p2pChess.Gui.P2PChess;
+import com.evan.p2pChess.Gui.Settings;
 
 /**
  * Piece Class
@@ -28,6 +40,7 @@ public abstract class Piece implements Movement {
     protected Integer pieceValue;
     protected Color pieceColor;
     protected Player pieceOwner;
+    private JDialog promotionDialog;
     protected final Map<String, ImageIcon> pieceImageCache = new HashMap<>();
 
     public Piece(Integer[][] position, String name, Integer value, Color color, Player owner) {
@@ -36,6 +49,7 @@ public abstract class Piece implements Movement {
         this.pieceValue = value;
         this.pieceColor = color;
         this.pieceOwner = owner;
+        this.promotionDialog = new JDialog();
     }
 
     //Getters
@@ -92,11 +106,107 @@ public abstract class Piece implements Movement {
         List<Point> legalMoves = getLegalMoves(board);
         
         for (Point move : legalMoves) {
-            int newCol = move.x;
-            int newRow = move.y;
+            int newRow = move.x;
+            int newCol = move.y;
 
             gui.moveHighlightTile(this.getPieceColor(), newRow, newCol);
         }
+    }
+
+    /**
+     * promotePiece()
+     * 
+     * @param promotionPawn
+     * @param board
+     * @return
+     */
+    protected Piece promotePiece(Pawn promotionPawn, Board board) {
+        //Create a custom dialog for piece selection
+        promotionDialog = new JDialog();
+        promotionDialog.setModal(true);
+        promotionDialog.setUndecorated(true);
+        promotionDialog.getRootPane().setBorder(BorderFactory.createLineBorder(java.awt.Color.BLACK, 2));
+        
+        //Create a panel with a 2x2 grid
+        JPanel promotionPanel = new JPanel(new GridLayout(2, 2, 10, 10));
+        promotionPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        
+        // Define promotion options
+        List<Class<? extends Piece>> promotionOptions = Arrays.asList(Queen.class, Rook.class, Bishop.class, Knight.class);
+        
+        // Button selection result
+        Piece[] selectedPiece = new Piece[1];
+        
+        // Create buttons for each piece type
+        for (Class<? extends Piece> pieceClass : promotionOptions) {
+            JButton pieceButton = createPromotionButton(
+                pieceClass, 
+                promotionPawn.getPieceColor(), 
+                board, 
+                promotionDialog, 
+                selectedPiece,
+                promotionPawn
+            );
+            promotionPanel.add(pieceButton);
+        }
+        
+        // Setup dialog
+        promotionDialog.add(promotionPanel);
+        promotionDialog.pack();
+        promotionDialog.setLocationRelativeTo(null); // Center on screen
+        promotionDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        
+        // Show dialog and wait for selection
+        promotionDialog.setVisible(true);
+        
+        return selectedPiece[0];
+    }
+
+    private JButton createPromotionButton(Class<? extends Piece> pieceClass, Color color, Board board, JDialog parentDialog, Piece[] selectedPieceHolder, Pawn originalPawn) {
+        JButton button = new JButton();
+        button.setPreferredSize(new Dimension(100, 100));
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createRaisedBevelBorder());
+        button.setBackground(Settings.WHITE_COLOR);
+        
+        try {
+            //Create a temporary piece to get its icon
+            Piece tempPiece = pieceClass.getConstructor(Integer[][].class, Color.class, Player.class).newInstance(new Integer[][]{{originalPawn.getPieceRow(), originalPawn.getPieceCol()}}, color, originalPawn.getPieceOwner());
+            ImageIcon icon = tempPiece.getPieceImageIcon();
+            button.setIcon(icon);
+        } catch (Exception e) {
+            button.setText(getPieceSymbol());
+            e.printStackTrace();
+        }
+        
+        button.addActionListener(e -> {
+            try {
+                //Create the new piece at the current pawn's location
+                Piece promotedPiece = pieceClass.getConstructor(Integer[][].class, Color.class, Player.class).newInstance(new Integer[][]{{originalPawn.getPieceRow(), originalPawn.getPieceCol()}}, color, originalPawn.getPieceOwner());
+                selectedPieceHolder[0] = promotedPiece;
+                parentDialog.dispose();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Error creating piece: " + ex.getMessage(), "Promotion Error", JOptionPane.ERROR_MESSAGE
+                );
+            }
+        });
+
+        button.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/hover.wav"));
+                button.setBackground(Settings.SELECTED_COLOR);
+                promotionDialog.repaint();
+            }
+
+            @Override 
+            public void mouseExited(MouseEvent e) {
+                button.setBackground(Settings.WHITE_COLOR);
+            }
+        });
+        
+        return button;
     }
 
     /**

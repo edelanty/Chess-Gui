@@ -75,11 +75,20 @@ public class Pawn extends Piece {
                 Piece target = board.getPieceAt(newRow, newCol);
 
                 if (target != null && target.getPieceColor() != pieceColor) {
-                    legalMoves.add(new Point(newRow, curCol));
+                    legalMoves.add(new Point(newRow, newCol));
                 }
             }
 
-            //TODO: Add en passant logic here when implementing that feature
+            //En passant capture
+            if (newCol >= 0 && newCol < Board.BOARD_SIZE) {
+                Point enPassant = board.getEnPassantSquare();
+                if (enPassant != null && enPassant.equals(new Point(newRow, newCol))) {
+                    Piece adjacentPawn = board.getPieceAt(curRow, newCol);
+                    if (adjacentPawn instanceof Pawn && adjacentPawn.getPieceColor() != this.getPieceColor()) {
+                        legalMoves.add(new Point(newRow, newCol));
+                    }
+                }
+            }
         }
 
         return legalMoves;
@@ -90,84 +99,109 @@ public class Pawn extends Piece {
         boolean isValidMove = false;
         Integer curRow = this.getPieceRow();
         Integer curCol = this.getPieceCol();
-
-        if (newRow == curRow + direction && newCol == curCol && board.getPieceAt(newRow, newCol) == null) {
-            isValidMove = true; //Normal 1 step movement (if new row is + direction and it's same column and it's an empty tile ahead, return true)
-        } else if (!getHasMoved() && newRow == curRow + (direction * 2) && newCol == curCol && board.getPieceAt(curRow + direction, curCol) == null && board.getPieceAt(newRow, newCol) == null) {
-            isValidMove = true; //First move 2 step movement (if this pawn hasn't moved yet and same as above and nothing in front, return true)
-        } else if (newRow == curRow + direction && (newCol == curCol + 1 || newCol == curCol - 1)) {
-            Piece target = board.getPieceAt(newRow, newCol); //Capture case (diagonal) (if the target new row is curRow + direction and it's new col is left or right)
-            if (target != null && target.getPieceColor() != this.getPieceColor()) { 
-                isValidMove = true; //If player IS moving diagonal, check if there's a non-null piece on the tile and if it's opp color
+    
+        //En Passant logic
+        if (newRow == curRow + direction && (newCol == curCol + 1 || newCol == curCol - 1)) {
+            Point enPassant = board.getEnPassantSquare();
+            if (enPassant != null && enPassant.equals(new Point(newRow, newCol))) {
+                Piece adjacentPawn = board.getPieceAt(curRow, newCol);
+                if (adjacentPawn instanceof Pawn && adjacentPawn.getPieceColor() != this.getPieceColor()) {
+                    return true; //En passant capture
+                }
             }
-        } else {
-            isValidMove = false;
         }
-
+    
+        //Normal 1 step forward movement
+        if (newRow == curRow + direction && newCol == curCol && board.getPieceAt(newRow, newCol) == null) {
+            isValidMove = true;
+        }
+        //Double move
+        else if (!getHasMoved() && newRow == curRow + (direction * 2) && newCol == curCol && 
+                 board.getPieceAt(curRow + direction, curCol) == null && board.getPieceAt(newRow, newCol) == null) {
+            isValidMove = true;
+        }
+        //Diagonal capture
+        else if (newRow == curRow + direction && (newCol == curCol + 1 || newCol == curCol - 1)) {
+            Piece target = board.getPieceAt(newRow, newCol);
+            if (target != null && target.getPieceColor() != this.getPieceColor()) {
+                isValidMove = true;
+            }
+        }
+    
         return isValidMove;
     }
-
+    
     @Override
     public void move(Integer newRow, Integer newCol, Board board) {
         if (isValidMove(newRow, newCol, board)) {
             Integer curRow = this.getPieceRow();
             Integer curCol = this.getPieceCol();
-
+    
+            //En Passant capture logic
+            if (Math.abs(curCol - newCol) == 1 && board.getPieceAt(newRow, newCol) == null) {
+                Point enPassant = board.getEnPassantSquare();
+                if (enPassant != null && enPassant.equals(new Point(newRow, newCol))) {
+                    Piece adjacentPawn = board.getPieceAt(curRow, newCol);
+                    if (adjacentPawn instanceof Pawn && adjacentPawn.getPieceColor() != this.getPieceColor()) {
+                        //Perform the en passant capture
+                        Piece capturedPawn = board.getPieceAt(curRow, newCol);
+                        board.capturePiece(capturedPawn); //Capture the adjacent pawn
+                        board.setPieceAt(curRow, newCol, null); //Remove the captured pawn from the board
+                    }
+                }
+            }
+    
             Piece captured = board.getPieceAt(newRow, newCol);
-
-            //Handle captures
-            if (captured != null && captured.getPieceColor() != this.getPieceColor()) { //If the potential captured piece isn't null and the colors are opposite, "capture"
+    
+            //Handle normal captures (non-en-passant)
+            if (captured != null && captured.getPieceColor() != this.getPieceColor()) {
                 board.capturePiece(captured);
             }
-
-            //If not the first move set it equal to true
+    
+            //If a double move, set the possible enPassantSquare
+            if (Math.abs(newRow - curRow) == 2) {
+                board.setEnPassantSquare(new Point(curRow + direction, curCol));
+            }
+    
+            //Update "hasMoved" after first move
             if (!hasMoved) {
                 setHasMoved(true);
             }
-
+    
             //Remove old position from board
             board.setPieceAt(curRow, curCol, null);
-
+    
             //Update piece position
             this.setPieceRow(newRow);
             this.setPieceCol(newCol);
-
-            //Update board with new piece position
+    
+            //Place piece at new position on the board
             board.setPieceAt(newRow, newCol, this);
-
+    
+            //Check for promotion after move
             checkForPromotion(board);
         } else {
-            System.out.println("Invalid Move"); 
+            throw new IllegalArgumentException("Invalid Piece Move");
         }
     }
-    //TODO
+    
     /**
      * checkForPromotion()
      * 
      * Checks if a given pawn can promote, gives an option between the Queen, Knight, Rook, and Bishop.
+     * Once chosen places the piece on the board.
      * 
      * @param board
      */
     private void checkForPromotion(Board board) {
         Integer curRow = this.getPieceRow();
         Integer curCol = this.getPieceCol();
-        Color currentColor = this.pieceColor;
-        Color oppositeColor = (Color.WHITE == currentColor) ? Color.BLACK : Color.WHITE;
-
-        if (oppositeColor == Color.BLACK && curRow == Board.BLACK_BACK_ROW) { //Prompt for promotion
-            promotePiece();
-            return;    
-        }
-
-        if (oppositeColor == Color.WHITE && curRow == Board.WHITE_BACK_ROW) {
-            promotePiece();
-            return;
+        if ((this.pieceColor == Color.WHITE && curRow == Board.BLACK_BACK_ROW) || (this.pieceColor == Color.BLACK && curRow == Board.WHITE_BACK_ROW)) {
+            Piece promoted = promotePiece(this, board);
+            board.setPieceAt(curRow, curCol, promoted);
+            promoted.setPieceRow(curRow);
+            promoted.setPieceCol(curCol);
         }
     }
 
-    private void promotePiece() {
-
-    }
-
-    //TODO code en passant
 }

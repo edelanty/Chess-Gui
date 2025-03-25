@@ -174,8 +174,7 @@ public class P2PChess {
      * 
      */
     private void setupGui() {
-        // board.resetBoard();
-        board.setDebugPieces();
+        board.resetBoard();
         chessBoardPanel.add(createChessBoardPanel(), BorderLayout.CENTER);
         chessBoardPanel.add(createMoveHistoryPanel(), BorderLayout.EAST);
         chessBoardPanel.add(createBlackCapturedPiecePanel(), BorderLayout.NORTH);
