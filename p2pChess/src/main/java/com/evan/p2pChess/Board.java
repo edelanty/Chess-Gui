@@ -199,6 +199,10 @@ public class Board {
         SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/move.wav"));
     }
 
+    public void playPieceCheckSound() {
+        SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/check.wav"));
+    }
+
     /**
      * playPieceCaptureSound()
      * 

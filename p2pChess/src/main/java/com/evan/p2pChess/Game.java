@@ -115,6 +115,10 @@ public class Game {
             //Active timer, darker background
             label.setBackground(Settings.GRAY_DARK_BOX_COLOR);
             label.setForeground(java.awt.Color.WHITE);
+
+            if (seconds == 10) { //Play sound if at 10 seconds
+                SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/tenseconds.wav"));
+            }
     
             if (seconds <= 10) {
                 //Low time: red text

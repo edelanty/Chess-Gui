@@ -601,11 +601,11 @@ public class P2PChess {
         
         if (checkDetector.isKingInCheck(opponentColor)) {
             //Notify the player that the opponent is in check
-            notifyCheck();
+            board.playPieceCheckSound();
             
             //Then check if it's checkmate
             if (checkDetector.isCheckmate(opponentColor)) {
-                // Game over - current player wins
+                //Game over - current player wins
                 handleCheckmate();
             }
         } else {
@@ -617,16 +617,25 @@ public class P2PChess {
         }
     }
 
-    private void notifyCheck() {
-        System.out.println("CHECK");
-    }
-
     private void handleCheckmate() {
-        System.out.println("CHECKMATED");
+        showEndGameDialog("Checkmate");
     }
 
     private void handleStalemate() {
-        System.out.println("STALEMATED");
+        showEndGameDialog("Stalemate");
+    }
+
+    /**
+     * showEndGameDialog()
+     * 
+     * Popups a dialogue when ending a game.
+     * 
+     * @param messageText Gives a message depending on this param
+     */
+    private void showEndGameDialog(String messageText) {
+        String winner = (whiteTurn) ? whitePlayer.getPlayerName() : blackPlayer.getPlayerName();
+        EndGameDialog dialog = new EndGameDialog(null, messageText, winner, mainPanel, cardLayout);
+        dialog.setVisible(true);
     }
 
     private boolean isAiTurn() {

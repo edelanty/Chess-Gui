@@ -131,13 +131,13 @@ public abstract class Piece implements Movement {
         JPanel promotionPanel = new JPanel(new GridLayout(2, 2, 10, 10));
         promotionPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         
-        // Define promotion options
+        //Define promotion options
         List<Class<? extends Piece>> promotionOptions = Arrays.asList(Queen.class, Rook.class, Bishop.class, Knight.class);
         
-        // Button selection result
+        //Button selection result
         Piece[] selectedPiece = new Piece[1];
         
-        // Create buttons for each piece type
+        //Create buttons for each piece type
         for (Class<? extends Piece> pieceClass : promotionOptions) {
             JButton pieceButton = createPromotionButton(
                 pieceClass, 
@@ -150,13 +150,13 @@ public abstract class Piece implements Movement {
             promotionPanel.add(pieceButton);
         }
         
-        // Setup dialog
+        //Setup dialog
         promotionDialog.add(promotionPanel);
         promotionDialog.pack();
-        promotionDialog.setLocationRelativeTo(null); // Center on screen
+        promotionDialog.setLocationRelativeTo(null); //Center on screen
         promotionDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         
-        // Show dialog and wait for selection
+        //Show dialog and wait for selection
         promotionDialog.setVisible(true);
         
         return selectedPiece[0];
