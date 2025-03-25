@@ -1,5 +1,7 @@
 package com.evan.p2pChess;
 
+import java.awt.Point;
+
 import com.evan.p2pChess.Pieces.*;
 
 /**
@@ -37,11 +39,13 @@ public class Board {
     public static final int COL_H = 7;
 
     private Tile[][] board;
+    private Point enPassantSquare;
     private Player whitePlayer;
     private Player blackPlayer;
 
     public Board(Player whitePlayer, Player blackPlayer) {
         this.board = new Tile[BOARD_SIZE][BOARD_SIZE];
+        this.enPassantSquare = new Point();
         this.whitePlayer = whitePlayer;
         this.blackPlayer = blackPlayer;
 
@@ -58,9 +62,17 @@ public class Board {
         return board[x][y].getPiece();
     }
 
+    public Point getEnPassantSquare() {
+        return enPassantSquare;
+    }
+
     //Setters
     public void setPieceAt(int x, int y, Piece piece) {
         board[x][y].setPiece(piece);
+    }
+
+    public void setEnPassantSquare(Point point) {
+        enPassantSquare = point;
     }
 
     /**
