@@ -35,6 +35,23 @@ public class Player {
         return playerName;
     }
 
+    //Setters
+    public void setPlayerPoints(Integer points) {
+        playerPoints = points;
+    }
+
+    /**
+     * resetPlayer()
+     * 
+     * Resets the player excluding color and name for a new game.
+     * 
+     */
+    public void resetPlayer() {
+        playerPoints = 0;
+        playerMoves.clear();
+        playerCapturedPieces.clear();
+    }
+
     /**
      * addPlayerMove()
      * 

@@ -584,18 +584,22 @@ public class P2PChess {
             updateMoveListDisplay(selectedPiece, selectedRow, selectedCol, row, col);
             //Start the game clock if needed
             startGameClockIfFirstMove();
-            //Check for ending
-            checkForEndGame(selectedPiece);
-            //Switch turn logic
-            whiteTurn = !whiteTurn;
-            game.switchTurns(whiteTurn);
-            fenString = fenGen.generateFEN(board, whiteTurn, moveNumber);
+            //Check for ending, if ended don't switch back turns
+            if (!checkForEndGame(selectedPiece)) {
+                whiteTurn = !whiteTurn;
+                game.switchTurns(whiteTurn);
+            }
+            //Generate new FEN string for the AI if playing against
+            if (gamemode == Gamemode.HUMAN_VS_AI) {
+                fenString = fenGen.generateFEN(board, whiteTurn, moveNumber);
+            }
         } else { //If not a valid move shake the piece around
             invalidMoveFeedback(selectedRow, selectedCol);
         }
     }
 
-    private void checkForEndGame(Piece currentPiece) {
+    private boolean checkForEndGame(Piece currentPiece) {
+        boolean isEndGame = false;
         com.evan.p2pChess.Color currentColor = currentPiece.getPieceColor();
         com.evan.p2pChess.Color opponentColor = (currentColor == com.evan.p2pChess.Color.WHITE) ? com.evan.p2pChess.Color.BLACK : com.evan.p2pChess.Color.WHITE;
         
@@ -606,23 +610,36 @@ public class P2PChess {
             //Then check if it's checkmate
             if (checkDetector.isCheckmate(opponentColor)) {
                 //Game over - current player wins
+                chessBoardPanel.repaint();
+                isEndGame = true;
                 handleCheckmate();
             }
         } else {
             //Check for stalemate
             if (checkDetector.isStalemate(opponentColor)) {
                 //Game over - draw
+                isEndGame = true;
                 handleStalemate();
             }
         }
+
+        return isEndGame;
     }
 
     private void handleCheckmate() {
+        board.playPieceCheckmateSound();
+        game.gameOver();
         showEndGameDialog("Checkmate");
     }
 
     private void handleStalemate() {
+        game.gameOver();
         showEndGameDialog("Stalemate");
+    }
+
+    public void handleTimeRanOut() {
+        game.gameOver();
+        showEndGameDialog("Time");
     }
 
     /**
@@ -634,10 +651,17 @@ public class P2PChess {
      */
     private void showEndGameDialog(String messageText) {
         String winner = (whiteTurn) ? whitePlayer.getPlayerName() : blackPlayer.getPlayerName();
-        EndGameDialog dialog = new EndGameDialog(null, messageText, winner, mainPanel, cardLayout);
+        EndGameDialog dialog = new EndGameDialog(null, messageText, winner, mainPanel, cardLayout, this);
         dialog.setVisible(true);
     }
 
+    /**
+     * isAiTurn()
+     * 
+     * Returns true or false depending on if it's the AI's move or not.
+     * 
+     * @return
+     */
     private boolean isAiTurn() {
         boolean isAiTurn = false;
 
@@ -1284,8 +1308,37 @@ public class P2PChess {
         }
     }
 
-    private void newGame() {
-        //TODO make a new game
+    public void newGame() {
+        //Reset the board controller
+        board.resetBoard();
+        //Reset the players
+        whitePlayer.resetPlayer();
+        blackPlayer.resetPlayer();
+        //Reset captured pieces
+        whiteCapturedPieces.clear();
+        blackCapturedPieces.clear();
+        //Reset FEN string
+        fenString = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+        //White moves first and there's no move yet
+        whiteTurn = true;
+        hasFirstMove = false;
+        moveNumber = 1;
+        //Reset the move list table
+        DefaultTableModel model = (DefaultTableModel) moveHistoryTable.getModel();
+        model.setRowCount(0); //Clear all rows
+        //Reset the timers based on the time selection
+        whiteTimerLabel.setText("White: " + settings.getTimeSelection().toString() + ":00");
+        blackTimerLabel.setText("Black: " + settings.getTimeSelection().toString() + ":00");
+        //Reset GUI elements
+        refreshBoardDisplay();
+        chessBoardPanel.revalidate();
+        chessBoardPanel.repaint();
+        whiteCapturedPanel.revalidate();
+        whiteCapturedPanel.repaint();
+        blackCapturedPanel.revalidate();
+        blackCapturedPanel.repaint();
+        moveListPanel.revalidate();
+        moveListPanel.repaint();
     }
 
 }

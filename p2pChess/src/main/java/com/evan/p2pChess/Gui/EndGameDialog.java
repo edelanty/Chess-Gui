@@ -12,12 +12,14 @@ public class EndGameDialog extends JDialog {
     private ConfettiPanel confettiPanel;
     private JPanel mainPanel;
     private CardLayout cardLayout;
+    private P2PChess gui;
 
-    public EndGameDialog(Frame parent, String gameOutcome, String winner, JPanel mainPanel, CardLayout cardLayout) {
+    public EndGameDialog(Frame parent, String gameOutcome, String winner, JPanel mainPanel, CardLayout cardLayout, P2PChess gui) {
         super(parent, "Game Over", true);
         
         this.mainPanel = mainPanel;
         this.cardLayout = cardLayout;
+        this.gui = gui;
         
         // Create a layered pane to handle confetti
         JLayeredPane layeredPane = new JLayeredPane();
@@ -83,12 +85,12 @@ public class EndGameDialog extends JDialog {
         JButton exitButton = createStyledButton("Exit", Color.RED);
         
         rematchButton.addActionListener(e -> {
-            // TODO
             dispose();
+            gui.newGame();
         });
         
         exitButton.addActionListener(e -> {
-            // TODO
+            gui.newGame();
             cardLayout.show(mainPanel, "Start Screen");
             dispose();
         });

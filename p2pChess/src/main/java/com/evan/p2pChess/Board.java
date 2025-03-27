@@ -199,8 +199,24 @@ public class Board {
         SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/move.wav"));
     }
 
+    /**
+     * playPieceCheckSound()
+     * 
+     * Calls the play method from the SoundManager class to play the check sound.
+     * 
+     */
     public void playPieceCheckSound() {
         SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/check.wav"));
+    }
+
+    /**
+     * playPieceCheckmateSound()
+     * 
+     * Calls the play method from the SoundManager class to play the checkmate sound.
+     * 
+     */
+    public void playPieceCheckmateSound() {
+        SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/checkmate.wav"));
     }
 
     /**

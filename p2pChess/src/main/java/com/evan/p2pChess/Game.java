@@ -3,11 +3,11 @@ package com.evan.p2pChess;
 import javax.swing.*;
 
 import com.evan.p2pChess.Gui.Gui;
+import com.evan.p2pChess.Gui.P2PChess;
 import com.evan.p2pChess.Gui.Settings;
 
 public class Game {
     private Integer gameTime;
-    private Integer gameWinner;
 
     private Timer blackTimer;
     private Timer whiteTimer;
@@ -17,26 +17,21 @@ public class Game {
     private JLabel blackTimerLabel;
     private JLabel whiteTimerLabel;
 
+    private P2PChess p2pChess;
+
     public Game() {
         this.gameTime = 0;
-        this.gameWinner = 0;
     }
 
     //Getters
-    public Integer getGameWinner() {
-        return gameWinner;
-    }
-
     public Integer getGameTime() {
         return gameTime;
     }
 
-    /**
-     * Sets the winner of the game.
-     */
-    public void setGameWinner(Integer winner) {
-        gameWinner = winner;
-    }
+    //Setters
+    public void setP2PChess(P2PChess p2pChess) {
+        this.p2pChess = p2pChess;
+    }    
 
     /**
      * setGameTime()
@@ -80,6 +75,7 @@ public class Game {
                 blackTimer.stop();
                 whiteTimer.stop();
                 gameOver();
+                p2pChess.handleTimeRanOut();
             }
         });
 
@@ -90,6 +86,7 @@ public class Game {
                 whiteTimer.stop();
                 blackTimer.stop();
                 gameOver();
+                p2pChess.handleTimeRanOut();
             }
         });
 
@@ -197,12 +194,21 @@ public class Game {
     /**
      * gameOver()
      * 
-     * Stops the clocks.
+     * Stops the clocks and resets their time.
      * 
      */
     public void gameOver() {
         whiteTimer.stop();
         blackTimer.stop();
+        
+        //Reset time to initial values
+        blackTimeSeconds = gameTime * 60;
+        whiteTimeSeconds = gameTime * 60;
+        gameTime = 0;
+        
+        //Update timer labels to show reset time
+        updateTimerLabel(blackTimerLabel, blackTimeSeconds);
+        updateTimerLabel(whiteTimerLabel, whiteTimeSeconds);
     }
 
     /**
