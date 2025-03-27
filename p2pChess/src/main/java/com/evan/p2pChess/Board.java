@@ -227,6 +227,16 @@ public class Board {
      */
     public void playPieceCaptureSound() {
         SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/capture.wav"));
-    } 
+    }
+
+    /**
+     * playGameStartSound()
+     * 
+     * Calls the play method from the SoundManager class to play the start sound.
+     * 
+     */
+    public void playGameStartSound() {
+        SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/start.wav"));
+    }
 
 }

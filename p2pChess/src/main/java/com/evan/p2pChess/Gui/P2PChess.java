@@ -157,6 +157,10 @@ public class P2PChess {
         this.playerColor = playerColor;
     }
 
+    public void setTurnOpposite() {
+        whiteTurn = !whiteTurn;
+    }
+
     /**
      * runGui()
      * 
@@ -638,7 +642,6 @@ public class P2PChess {
     }
 
     public void handleTimeRanOut() {
-        game.gameOver();
         showEndGameDialog("Time");
     }
 
@@ -651,7 +654,7 @@ public class P2PChess {
      */
     private void showEndGameDialog(String messageText) {
         String winner = (whiteTurn) ? whitePlayer.getPlayerName() : blackPlayer.getPlayerName();
-        EndGameDialog dialog = new EndGameDialog(null, messageText, winner, mainPanel, cardLayout, this);
+        EndGameDialog dialog = new EndGameDialog(null, messageText, winner, mainPanel, cardLayout, this, board);
         dialog.setVisible(true);
     }
 
@@ -1286,29 +1289,18 @@ public class P2PChess {
                     return;
                 }
 
-                game.gameOver(); //Else just end the game
-                stopGame(whiteTurn);
+                handleResignation();
             }
         });
     }
 
-    private void stopGame(boolean whiteTurn) {
-        String message = whiteTurn ? "White Lost" : "Black Lost";
-        JOptionPane.showMessageDialog(null, message);
-        
-        int choice = JOptionPane.showConfirmDialog(null, 
-                    "Would you like to play again?", 
-                    "Game Over", 
-                    JOptionPane.YES_NO_OPTION);
-        
-        newGame();
-
-        if (choice == JOptionPane.NO_OPTION) {
-            cardLayout.show(mainPanel, "Start Screen");
-        }
+    private void handleResignation() {
+        game.gameOver();
+        showEndGameDialog("Resignation");
     }
 
     public void newGame() {
+        System.out.println("New Game Called");
         //Reset the board controller
         board.resetBoard();
         //Reset the players

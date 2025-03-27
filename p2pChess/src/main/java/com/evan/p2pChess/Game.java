@@ -72,9 +72,8 @@ public class Game {
             blackTimeSeconds--;
             updateTimerLabel(blackTimerLabel, blackTimeSeconds);
             if (blackTimeSeconds <= 0) {
-                blackTimer.stop();
-                whiteTimer.stop();
                 gameOver();
+                p2pChess.setTurnOpposite();
                 p2pChess.handleTimeRanOut();
             }
         });
@@ -83,10 +82,9 @@ public class Game {
             whiteTimeSeconds--;
             updateTimerLabel(whiteTimerLabel, whiteTimeSeconds);
             if (whiteTimeSeconds <= 0) {
-                whiteTimer.stop();
-                blackTimer.stop();
                 gameOver();
-                p2pChess.handleTimeRanOut();
+                p2pChess.setTurnOpposite();
+                p2pChess.handleTimeRanOut();//TODO fix this stuss
             }
         });
 
