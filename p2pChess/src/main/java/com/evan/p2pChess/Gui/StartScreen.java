@@ -21,7 +21,8 @@ public class StartScreen {
     private JPanel startScreenPanel;
     private JPanel mainPanel;
     private JButton playVsAIButton;
-    private JButton playVsHumanButton;
+    private JButton playLocalButton;
+    private JButton playOnlineButton;
     private JButton settingsButton;
     private CardLayout cardLayout;
     private boolean hasAIGameStarted;
@@ -40,8 +41,9 @@ public class StartScreen {
                 }
             }
         };
-        this.playVsAIButton = new JButton("Play vs AI");
-        this.playVsHumanButton = new JButton("Play vs Human");
+        this.playVsAIButton = new JButton("Play Vs Bots");
+        this.playLocalButton = new JButton("Play co-op Local");
+        this.playOnlineButton = new JButton("Play co-op Online");
         this.settingsButton = new JButton("Settings");
         this.cardLayout = cardLayout;
         this.hasAIGameStarted = false;
@@ -60,8 +62,8 @@ public class StartScreen {
 
     private JPanel titlePanel() {
         JPanel newPanel = new JPanel();
-        JLabel titleLabel = new JLabel("P2P Chess");
-        JLabel madeBy = new JLabel("Evan Delanty");
+        JLabel titleLabel = new JLabel("Chess Gui");
+        JLabel madeBy = new JLabel("Created by Evan Delanty");
 
         newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
         newPanel.setOpaque(false);
@@ -89,13 +91,16 @@ public class StartScreen {
         newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
 
         setupButton(playVsAIButton);
-        setupButton(playVsHumanButton);
+        setupButton(playLocalButton);
+        setupButton(playOnlineButton);
         setupButton(settingsButton);
 
         newPanel.add(Box.createVerticalGlue());
         newPanel.add(playVsAIButton);
         newPanel.add(Box.createVerticalStrut(20));
-        newPanel.add(playVsHumanButton);
+        newPanel.add(playOnlineButton);
+        newPanel.add(Box.createVerticalStrut(20));
+        newPanel.add(playLocalButton);
         newPanel.add(Box.createVerticalStrut(20));
         newPanel.add(settingsButton);
         newPanel.add(Box.createVerticalGlue());
@@ -134,7 +139,17 @@ public class StartScreen {
 
         setupMouseListeners(playVsAIButton);
 
-        playVsHumanButton.addActionListener(new ActionListener() {
+        playOnlineButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/select.wav"));
+                cardLayout.show(mainPanel, "Connect Screen");
+            }
+        });
+
+        setupMouseListeners(playOnlineButton);
+
+        playLocalButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/select.wav"));
@@ -142,7 +157,7 @@ public class StartScreen {
             }
         });
 
-        setupMouseListeners(playVsHumanButton);
+        setupMouseListeners(playLocalButton);
 
         settingsButton.addActionListener(new ActionListener() {
             @Override
