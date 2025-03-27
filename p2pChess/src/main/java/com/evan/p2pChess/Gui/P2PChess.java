@@ -576,7 +576,7 @@ public class P2PChess {
      * @param col Col moving to
      */
     private void handleSuccessfulMoves(Piece selectedPiece, Piece destinationPiece, int row, int col) {
-        if (selectedPiece != null && selectedPiece.isValidMove(row, col, board)) { //Executed after successful move
+        if (selectedPiece != null && selectedPiece.isValidMove(row, col, board) && !checkDetector.isKingInCheckAfterMove(selectedPiece, selectedRow, selectedCol, row, col, selectedPiece.getPieceColor())) { //Executed after successful move
             //If there's no capture play the normal piece move sound otherwise don't do anything
             if (!checkForCapture(destinationPiece, selectedPiece)) {
                 board.playPieceMovingSound();
@@ -784,7 +784,7 @@ public class P2PChess {
             //Init the actual timers
             whiteTimerLabel.setText("White: " + settings.getTimeSelection().toString() + ":00");
             blackTimerLabel.setText("Black: " + settings.getTimeSelection().toString() + ":00");
-            game.initializeTimers(blackTimerLabel, whiteTimerLabel, settings.getTimeSelection());
+            game.initializeTimers(blackTimerLabel, whiteTimerLabel, settings.getTimeSelection(), this);
             game.startGameClock(whiteTurn);
             hasFirstMove = !hasFirstMove;
         }
@@ -1299,8 +1299,13 @@ public class P2PChess {
         showEndGameDialog("Resignation");
     }
 
+    /**
+     * newGame()
+     * 
+     * Resets the internal controller objects and the GUI.
+     * 
+     */
     public void newGame() {
-        System.out.println("New Game Called");
         //Reset the board controller
         board.resetBoard();
         //Reset the players

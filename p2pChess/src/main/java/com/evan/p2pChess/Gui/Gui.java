@@ -40,8 +40,6 @@ public class Gui {
         settings.runGui();
         settings.setP2pChess(p2pChess);
         settings.setAi2PChess(ai2pChess);
-        game.setP2PChess(p2pChess);
-        game.setP2PChess(ai2pChess);
         ai2pChess.setPlayerColor(playerColor);
 
         mainPanel.add(startScreen.getStartScreenPanel(), "Start Screen");

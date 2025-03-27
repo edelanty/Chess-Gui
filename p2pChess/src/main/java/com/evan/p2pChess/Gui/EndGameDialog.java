@@ -88,11 +88,9 @@ public class EndGameDialog extends JDialog {
         JButton exitButton = createStyledButton("Exit", Color.RED);
         
         rematchButton.addActionListener(e -> {
-            SwingUtilities.invokeLater(() -> {
-                dispose();
-                gui.newGame();
-                board.playGameStartSound();
-            });
+            dispose();
+            gui.newGame();
+            board.playGameStartSound();
         });
         
         exitButton.addActionListener(e -> {

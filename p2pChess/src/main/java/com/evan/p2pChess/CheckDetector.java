@@ -55,7 +55,7 @@ public class CheckDetector {
         return false;
     }
 
-    private boolean isKingInCheckAfterMove(Piece piece, int fromRow, int fromCol, int toRow, int toCol, Color color) {
+    public boolean isKingInCheckAfterMove(Piece piece, int fromRow, int fromCol, int toRow, int toCol, Color color) {
         //Save original state
         Piece originalDestinationPiece = board.getPieceAt(toRow, toCol);
         //Update board state

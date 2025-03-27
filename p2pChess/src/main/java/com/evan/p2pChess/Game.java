@@ -8,16 +8,12 @@ import com.evan.p2pChess.Gui.Settings;
 
 public class Game {
     private Integer gameTime;
-
     private Timer blackTimer;
     private Timer whiteTimer;
     private int blackTimeSeconds;
     private int whiteTimeSeconds;
-
     private JLabel blackTimerLabel;
     private JLabel whiteTimerLabel;
-
-    private P2PChess p2pChess;
 
     public Game() {
         this.gameTime = 0;
@@ -27,11 +23,6 @@ public class Game {
     public Integer getGameTime() {
         return gameTime;
     }
-
-    //Setters
-    public void setP2PChess(P2PChess p2pChess) {
-        this.p2pChess = p2pChess;
-    }    
 
     /**
      * setGameTime()
@@ -61,7 +52,7 @@ public class Game {
      * Initializes the game clocks with the given initial time and associates them with labels.
      * 
      */
-    public void initializeTimers(JLabel blackTimerLabel, JLabel whiteTimerLabel, int initialMinutes) {
+    public void initializeTimers(JLabel blackTimerLabel, JLabel whiteTimerLabel, int initialMinutes, P2PChess currentGame) {
         this.blackTimerLabel = blackTimerLabel;
         this.whiteTimerLabel = whiteTimerLabel;
 
@@ -73,8 +64,8 @@ public class Game {
             updateTimerLabel(blackTimerLabel, blackTimeSeconds);
             if (blackTimeSeconds <= 0) {
                 gameOver();
-                p2pChess.setTurnOpposite();
-                p2pChess.handleTimeRanOut();
+                currentGame.setTurnOpposite();
+                currentGame.handleTimeRanOut();
             }
         });
 
@@ -83,8 +74,8 @@ public class Game {
             updateTimerLabel(whiteTimerLabel, whiteTimeSeconds);
             if (whiteTimeSeconds <= 0) {
                 gameOver();
-                p2pChess.setTurnOpposite();
-                p2pChess.handleTimeRanOut();//TODO fix this stuss
+                currentGame.setTurnOpposite();
+                currentGame.handleTimeRanOut();
             }
         });
 
@@ -142,6 +133,7 @@ public class Game {
             whiteTimer.stop();
             blackTimer.start();
         }
+
         updateTimerLabel(blackTimerLabel, blackTimeSeconds);
         updateTimerLabel(whiteTimerLabel, whiteTimeSeconds);
     }
