@@ -6,6 +6,7 @@ import java.util.Queue;
 public class Player {
     private String playerName;
     private Integer playerPoints;
+    @SuppressWarnings("unused")
     private Color playerColor;
     private Queue<String> playerMoves;
     private Queue<String> playerCapturedPieces;
