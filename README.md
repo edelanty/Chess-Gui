@@ -48,6 +48,3 @@ This program is a feature-rich Java-based chess game with a peer-to-peer playing
 - Click again on a destination tile to move.
 - Play until checkmate, stalemate, or until your time runs out!
 - Adjust settings and AI difficulty in the settings menu.
-
-## License
-This project is licensed under the MIT License.
