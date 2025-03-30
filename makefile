@@ -1,7 +1,7 @@
 build: 
 	mvn -f p2pChess/pom.xml package
 
-run:
+run: build
 	java -jar p2pChess/target/p2pChess-1.0.jar
 
 test:

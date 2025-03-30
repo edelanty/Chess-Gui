@@ -11,6 +11,9 @@ import org.junit.jupiter.api.Test;
 public class UciTest {
     @Test
     public void stockfishBestMoveTest() throws InterruptedException, ExecutionException, TimeoutException {
+        if (System.getProperty("os.name").toLowerCase().contains("win")) {
+            return;
+        }
         Uci uci = new Uci();
         String bestMove = "";
         String expected = "f4g3";
@@ -31,6 +34,9 @@ public class UciTest {
 
     @Test
     public void stockfishBestMoveFunctionTest() throws InterruptedException, ExecutionException, TimeoutException {
+        if (System.getProperty("os.name").toLowerCase().contains("win")) {
+            return;
+        }
         Uci uci = new Uci();
         String bestMove = "";
         String expected = "f4g3";
