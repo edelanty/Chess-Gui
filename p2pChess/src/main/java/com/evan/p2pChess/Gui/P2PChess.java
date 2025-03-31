@@ -14,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,6 +43,7 @@ import com.evan.p2pChess.Game;
 import com.evan.p2pChess.Gamemode;
 import com.evan.p2pChess.Player;
 import com.evan.p2pChess.Uci;
+import com.evan.p2pChess.Online.NetworkConnection;
 import com.evan.p2pChess.Pieces.Piece;
 
 public class P2PChess {
@@ -93,6 +95,8 @@ public class P2PChess {
     private com.evan.p2pChess.Color playerColor;
     private CheckDetector checkDetector;
 
+    private NetworkConnection networkConnection;
+
     private static final int PIECE_SIZE = 50;
     private static final int MOVE_NUMBER_COLUMN_SIZE = 30;
     private static final int WHITE_MOVE_COLUMN_SIZE = 60;
@@ -133,6 +137,7 @@ public class P2PChess {
         this.fenGen = new FenGenerator();
         this.playerColor = null;
         this.checkDetector = new CheckDetector(board);
+        this.networkConnection = null;
     }
     
     //Getters
@@ -169,6 +174,60 @@ public class P2PChess {
      */
     public void runGui() {
         setupGui();
+    }
+
+    /**
+     * startOnlineGame()
+     * 
+     * ...
+     * 
+     * @param connection
+     */
+    public void startOnlineGame(NetworkConnection connection, boolean isWhite) {
+        this.networkConnection = connection;
+        this.playerColor = (isWhite) ? com.evan.p2pChess.Color.WHITE : com.evan.p2pChess.Color.BLACK;
+    
+        //Start listening for opponent moves
+        new Thread(() -> {
+            while (true) {
+                try {
+                    String move = networkConnection.receiveMove();
+                    if (move != null) {
+                        SwingUtilities.invokeLater(() -> processReceivedMove(move));
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    break;
+                }
+            }
+        }).start();
+    }    
+    
+    /**
+     * processReceivedMove()
+     * 
+     * ...
+     * 
+     * @param move
+     */
+    private void processReceivedMove(String move) {
+        String[] parts = move.split(",");
+        if (parts.length == 4) {
+            int startRow = Integer.parseInt(parts[0]);
+            int startCol = Integer.parseInt(parts[1]);
+            int endRow = Integer.parseInt(parts[2]);
+            int endCol = Integer.parseInt(parts[3]);
+    
+            Piece movingPiece = board.getPieceAt(startRow, startCol);
+            if (movingPiece != null) {
+                movingPiece.move(endRow, endCol, board);
+                refreshBoardDisplay();
+                updateMoveListDisplay(movingPiece, startRow, startCol, endRow, endCol);
+                startGameClockIfFirstMove();
+                whiteTurn = !whiteTurn;
+                game.switchTurns(whiteTurn);
+            }
+        }
     }
 
     /**
@@ -531,6 +590,22 @@ public class P2PChess {
     private void handleTileClick(int row, int col) {
         Piece clickedPiece = board.getPieceAt(row, col);
 
+        System.out.println(playerColor);
+
+        if (whiteTurn) {
+            System.out.println("White turn");
+        } else {
+            System.out.println("Black turn");
+        }
+
+        if (whiteTurn && playerColor != com.evan.p2pChess.Color.WHITE) {
+            return;
+        }
+
+        if (!whiteTurn && playerColor != com.evan.p2pChess.Color.BLACK) {
+            return;
+        }
+
         //Resetting any previous right click code
         if (rightClickHighlightedPiece != null) {
             resetHighlightedTiles();
@@ -586,6 +661,15 @@ public class P2PChess {
             //Update the GUI
             refreshBoardDisplay();
             updateMoveListDisplay(selectedPiece, selectedRow, selectedCol, row, col);
+            //Handle online moves
+            if (networkConnection != null) {
+                try {
+                    String moveString = selectedRow + "," + selectedCol + "," + row + "," + col;
+                    networkConnection.sendMove(moveString);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
             //Start the game clock if needed
             startGameClockIfFirstMove();
             //Check for ending, if ended don't switch back turns

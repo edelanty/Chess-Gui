@@ -68,6 +68,7 @@ public class Settings {
     private JButton standardModeButton;
     private P2PChess p2pChess;
     private P2PChess ai2pChess;
+    private P2PChess onlineP2PChess;
     private Color primaryColor;
     private Color alternativeColor;
     private Integer timeSelection;
@@ -88,6 +89,7 @@ public class Settings {
         };
         this.p2pChess = null;
         this.ai2pChess = null;
+        this.onlineP2PChess = null;
         this.backButton = new JButton("Back");
         this.soundCheckbox = new JCheckBox("Enable Sound");
         this.bulletModeButton = createResizedIconButton("/com/evan/p2pChess/Gui/Images/Game Mode/bullet.png", 200, 125);
@@ -127,6 +129,10 @@ public class Settings {
 
     public void setAi2PChess(P2PChess ai2pChess) {
         this.ai2pChess = ai2pChess;
+    }
+
+    public void setOnlineP2pChess(P2PChess onlineP2PChess) {
+        this.onlineP2PChess = onlineP2PChess;
     }
 
     public void setIsSoundEnabled(boolean isSoundEnabled) {
@@ -304,6 +310,7 @@ public class Settings {
                 alternativeColor = darkColor;
                 p2pChess.updateBoardColors();
                 ai2pChess.updateBoardColors();
+                onlineP2PChess.updateBoardColors();
             }
         });
         
@@ -383,6 +390,13 @@ public class Settings {
                     ai2pChess.setBlackTimerLabel(BULLET_TIME.toString());
                     highlightSelectedMode(bulletModeButton);
                 }
+
+                if (!onlineP2PChess.getHasFirstMove()) { //For the play online option
+                    setTimeSelection(BULLET_TIME);
+                    ai2pChess.setWhiteTimerLabel(BULLET_TIME.toString());
+                    ai2pChess.setBlackTimerLabel(BULLET_TIME.toString());
+                    highlightSelectedMode(bulletModeButton);
+                }
             }
         });
 
@@ -404,6 +418,13 @@ public class Settings {
                     ai2pChess.setBlackTimerLabel(BLITZ_TIME.toString());
                     highlightSelectedMode(blitzModeButton);
                 }
+
+                if (!onlineP2PChess.getHasFirstMove()) { //For the play online option
+                    setTimeSelection(BLITZ_TIME);
+                    ai2pChess.setWhiteTimerLabel(BLITZ_TIME.toString());
+                    ai2pChess.setBlackTimerLabel(BLITZ_TIME.toString());
+                    highlightSelectedMode(blitzModeButton);
+                }
             }
         });
 
@@ -420,6 +441,13 @@ public class Settings {
                 }
 
                 if (!ai2pChess.getHasFirstMove()) { //For the play against AI option
+                    setTimeSelection(STANDARD_TIME);
+                    ai2pChess.setWhiteTimerLabel(STANDARD_TIME.toString());
+                    ai2pChess.setBlackTimerLabel(STANDARD_TIME.toString());
+                    highlightSelectedMode(standardModeButton);
+                }
+
+                if (!onlineP2PChess.getHasFirstMove()) { //For the play online option
                     setTimeSelection(STANDARD_TIME);
                     ai2pChess.setWhiteTimerLabel(STANDARD_TIME.toString());
                     ai2pChess.setBlackTimerLabel(STANDARD_TIME.toString());

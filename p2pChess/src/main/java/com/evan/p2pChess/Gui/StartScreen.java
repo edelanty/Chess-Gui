@@ -26,6 +26,7 @@ public class StartScreen {
     private JButton settingsButton;
     private CardLayout cardLayout;
     private boolean hasAIGameStarted;
+    private boolean hasOnlineGameStarted;
 
     public StartScreen(CardLayout cardLayout, JPanel mainPanel) {
         this.mainPanel = mainPanel;
@@ -47,6 +48,7 @@ public class StartScreen {
         this.settingsButton = new JButton("Settings");
         this.cardLayout = cardLayout;
         this.hasAIGameStarted = false;
+        this.hasOnlineGameStarted = false;
     }
 
     public JPanel getStartScreenPanel() {
@@ -143,7 +145,12 @@ public class StartScreen {
             @Override
             public void actionPerformed(ActionEvent e) {
                 SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/select.wav"));
-                cardLayout.show(mainPanel, "Connect Screen");
+                if (!hasOnlineGameStarted) {
+                    cardLayout.show(mainPanel, "Connect Screen");
+                    hasOnlineGameStarted = true;
+                } else {
+                    cardLayout.show(mainPanel, "Online Chess");
+                }
             }
         });
 
