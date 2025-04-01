@@ -12,7 +12,6 @@ public class Client implements NetworkConnection {
         socket = new Socket(serverAddress, port);
         input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         output = new PrintWriter(socket.getOutputStream(), true);
-        System.out.println("Connected to server.");
     }
 
     public void sendMove(String move) throws IOException {

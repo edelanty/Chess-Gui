@@ -104,13 +104,48 @@ public class PlayOnline {
             public void mouseClicked(MouseEvent e) {
                 try {
                     Server server = new Server(5000);
-                    JOptionPane.showMessageDialog(null, "Server started! Waiting for a player...\n" +
-                        "Share your IP address with a friend.");
+                    String ipAddresses = server.getServerIPAddresses();
                     
+                    //Create a dialog with IP information
+                    JDialog ipDialog = new JDialog();
+                    ipDialog.setTitle("Your IP Addresses");
+                    ipDialog.setSize(400, 300);
+                    ipDialog.setLocationRelativeTo(null);
+                    ipDialog.setModal(true);
+                    ipDialog.setLayout(new BorderLayout());
+                    
+                    //Create a panel for the IP information
+                    JPanel ipPanel = new JPanel();
+                    ipPanel.setLayout(new BorderLayout());
+                    ipPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+                    
+                    JLabel headerLabel = new JLabel("Share one to connect!");
+                    headerLabel.setFont(new Font("Georgia", Font.BOLD, 16));
+                    
+                    //Create a text area to display the IPs
+                    JTextArea ipTextArea = new JTextArea(ipAddresses);
+                    ipTextArea.setFont(new Font("Monospaced", Font.PLAIN, 16));
+                    ipTextArea.setEditable(false);
+                    ipTextArea.setBackground(ipPanel.getBackground());
+                    
+                    JLabel waitingLabel = new JLabel("Waiting for player to connect...");
+                    waitingLabel.setFont(new Font("Georgia", Font.ITALIC, 14));
+                    waitingLabel.setHorizontalAlignment(SwingConstants.CENTER);
+                    
+                    //Add components to the IP panel
+                    ipPanel.add(headerLabel, BorderLayout.NORTH);
+                    ipPanel.add(new JScrollPane(ipTextArea), BorderLayout.CENTER);
+                    ipPanel.add(waitingLabel, BorderLayout.SOUTH);
+                    
+                    //Add the IP panel to the dialog
+                    ipDialog.add(ipPanel, BorderLayout.CENTER);
+                    
+                    //Start a thread to wait for connection
                     new Thread(() -> {
                         try {
                             server.waitForConnection();
                             SwingUtilities.invokeLater(() -> {
+                                ipDialog.dispose(); // Close the dialog when player connects
                                 JOptionPane.showMessageDialog(null, "Player connected! Starting game...");
                                 p2pChess.startOnlineGame(server, true);
                                 cardLayout.show(mainPanel, "Online Chess");
@@ -118,11 +153,15 @@ public class PlayOnline {
                         } catch (IOException ex) {
                             ex.printStackTrace();
                             SwingUtilities.invokeLater(() -> {
+                                ipDialog.dispose();
                                 JOptionPane.showMessageDialog(null, "Connection error: " + ex.getMessage(), 
                                     "Error", JOptionPane.ERROR_MESSAGE);
                             });
                         }
                     }).start();
+                    
+                    ipDialog.setVisible(true);
+                    
                 } catch (IOException ex) {
                     ex.printStackTrace();
                     JOptionPane.showMessageDialog(null, "Failed to start server: " + ex.getMessage(), 

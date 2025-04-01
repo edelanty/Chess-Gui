@@ -12,12 +12,18 @@ public class Server implements NetworkConnection {
 
     public Server(int port) throws IOException {
         serverSocket = new ServerSocket(port);
-        displayServerIP();
     }
 
-    private void displayServerIP() {
+    /**
+     * getServerIPAddresses()
+     * 
+     * Grabs the IP of the user who started the server.
+     * 
+     * @return
+     */
+    public String getServerIPAddresses() {
+        StringBuilder ipInfo = new StringBuilder();
         try {
-            System.out.println("Server started. Your IP addresses:");
             Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
             
             while (networkInterfaces.hasMoreElements()) {
@@ -27,24 +33,22 @@ public class Server implements NetworkConnection {
                     while (addresses.hasMoreElements()) {
                         InetAddress address = addresses.nextElement();
                         if (address instanceof Inet4Address) {
-                            System.out.println(networkInterface.getDisplayName() + ": " + address.getHostAddress());
+                            ipInfo.append(address.getHostAddress()).append("\n");
                         }
                     }
                 }
             }
-            System.out.println("Port: " + serverSocket.getLocalPort());
-            System.out.println("Share this information with your friend to connect!");
         } catch (SocketException e) {
-            System.err.println("Error retrieving network interfaces: " + e.getMessage());
+            ipInfo.append("Error retrieving network addresses: ").append(e.getMessage());
         }
-    }
+        
+        return ipInfo.toString();
+    }    
 
     public void waitForConnection() throws IOException {
-        System.out.println("Waiting for a connection...");
         clientSocket = serverSocket.accept();
         input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         output = new PrintWriter(clientSocket.getOutputStream(), true);
-        System.out.println("Client connected from: " + clientSocket.getInetAddress().getHostAddress());
     }
 
     public void sendMove(String move) throws IOException {
