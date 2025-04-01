@@ -9,6 +9,13 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
 
+/**
+ * Handles creating the Gui for playing online and outputs all information needed for two players to connect to each other.
+ * 
+ * @author Evan Delanty
+ * @version v1.0.0
+ * @since 4/1/25
+ */
 public class PlayOnline {
     private JPanel onlinePanel;
     private JButton startGameButton;

@@ -226,16 +226,14 @@ public class P2PChess {
     
         String[] parts = move.split(",");
 
+        //Case for if the user changes time in online
         if (parts[0].equals("UPDATE")) {
-            System.out.println("HERE");
             settings.setTimeSelection(Integer.parseInt(parts[1]));
             setWhiteTimerLabel(settings.getTimeSelection().toString());
             setBlackTimerLabel(settings.getTimeSelection().toString());
             whiteTimerLabel.repaint();
             blackTimerLabel.repaint();
         }
-
-        System.out.println("NOT HERE");
 
         if (parts.length == 4) {
             int startRow = Integer.parseInt(parts[0]);
