@@ -225,6 +225,18 @@ public class P2PChess {
         }
     
         String[] parts = move.split(",");
+
+        if (parts[0].equals("UPDATE")) {
+            System.out.println("HERE");
+            settings.setTimeSelection(Integer.parseInt(parts[1]));
+            setWhiteTimerLabel(settings.getTimeSelection().toString());
+            setBlackTimerLabel(settings.getTimeSelection().toString());
+            whiteTimerLabel.repaint();
+            blackTimerLabel.repaint();
+        }
+
+        System.out.println("NOT HERE");
+
         if (parts.length == 4) {
             int startRow = Integer.parseInt(parts[0]);
             int startCol = Integer.parseInt(parts[1]);
@@ -1027,6 +1039,22 @@ public class P2PChess {
         } else {
             button.setIcon(null);
             button.setText("");
+        }
+    }
+
+    /**
+     * updateOtherClientSettings()
+     * 
+     * Required to update and sync timers when changed in settings on a single client.
+     * 
+     */
+    public void updateOtherClientSettings(Integer timeChosen) {
+        if (networkConnection != null) {
+            try {
+                networkConnection.sendMove("UPDATE" + "," + timeChosen);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

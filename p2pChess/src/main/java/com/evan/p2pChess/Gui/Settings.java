@@ -395,6 +395,7 @@ public class Settings {
                     setTimeSelection(BULLET_TIME);
                     onlineP2PChess.setWhiteTimerLabel(BULLET_TIME.toString());
                     onlineP2PChess.setBlackTimerLabel(BULLET_TIME.toString());
+                    onlineP2PChess.updateOtherClientSettings(BULLET_TIME);
                     highlightSelectedMode(bulletModeButton);
                 }
             }
@@ -423,6 +424,7 @@ public class Settings {
                     setTimeSelection(BLITZ_TIME);
                     onlineP2PChess.setWhiteTimerLabel(BLITZ_TIME.toString());
                     onlineP2PChess.setBlackTimerLabel(BLITZ_TIME.toString());
+                    onlineP2PChess.updateOtherClientSettings(BLITZ_TIME);
                     highlightSelectedMode(blitzModeButton);
                 }
             }
@@ -451,6 +453,7 @@ public class Settings {
                     setTimeSelection(STANDARD_TIME);
                     onlineP2PChess.setWhiteTimerLabel(STANDARD_TIME.toString());
                     onlineP2PChess.setBlackTimerLabel(STANDARD_TIME.toString());
+                    onlineP2PChess.updateOtherClientSettings(STANDARD_TIME);
                     highlightSelectedMode(standardModeButton);
                 }
             }
