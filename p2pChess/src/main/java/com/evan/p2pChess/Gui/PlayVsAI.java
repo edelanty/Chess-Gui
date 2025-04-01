@@ -1,10 +1,8 @@
 package com.evan.p2pChess.Gui;
 
 import javax.swing.*;
-
 import com.evan.p2pChess.SoundManager;
 import com.evan.p2pChess.Uci;
-
 import java.awt.*;
 import java.awt.event.*;
 

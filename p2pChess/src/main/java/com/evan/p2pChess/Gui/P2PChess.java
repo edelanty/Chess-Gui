@@ -211,6 +211,19 @@ public class P2PChess {
      * @param move
      */
     private void processReceivedMove(String move) {
+        //Check if thegame ended or just a normal move.
+        switch (move) {
+            case "CHECKMATE":
+                showEndGameDialog("Checkmate");
+                return;
+            case "STALEMATE":
+                showEndGameDialog("Stalemate");
+                return;
+            case "TIME":
+                showEndGameDialog("Time");
+                return;
+        }
+    
         String[] parts = move.split(",");
         if (parts.length == 4) {
             int startRow = Integer.parseInt(parts[0]);
@@ -590,19 +603,12 @@ public class P2PChess {
     private void handleTileClick(int row, int col) {
         Piece clickedPiece = board.getPieceAt(row, col);
 
-        System.out.println(playerColor);
-
-        if (whiteTurn) {
-            System.out.println("White turn");
-        } else {
-            System.out.println("Black turn");
-        }
-
-        if (whiteTurn && playerColor != com.evan.p2pChess.Color.WHITE) {
+        //Doesn't allow the wrong pieces to be clicked in online ONLY for online mode
+        if (whiteTurn && playerColor != com.evan.p2pChess.Color.WHITE && networkConnection != null) { //For white
             return;
         }
 
-        if (!whiteTurn && playerColor != com.evan.p2pChess.Color.BLACK) {
+        if (!whiteTurn && playerColor != com.evan.p2pChess.Color.BLACK && networkConnection != null) { //For black
             return;
         }
 
@@ -651,7 +657,8 @@ public class P2PChess {
      * @param col Col moving to
      */
     private void handleSuccessfulMoves(Piece selectedPiece, Piece destinationPiece, int row, int col) {
-        if (selectedPiece != null && selectedPiece.isValidMove(row, col, board) && !checkDetector.isKingInCheckAfterMove(selectedPiece, selectedRow, selectedCol, row, col, selectedPiece.getPieceColor())) { //Executed after successful move
+        //Checking for if the piece exists, has a move where the user is trying to go, and makes sure that the king isn't in check after doing this move.
+        if (selectedPiece != null && selectedPiece.isValidMove(row, col, board) && !checkDetector.isKingInCheckAfterMove(selectedPiece, selectedRow, selectedCol, row, col, selectedPiece.getPieceColor())) {
             //If there's no capture play the normal piece move sound otherwise don't do anything
             if (!checkForCapture(destinationPiece, selectedPiece)) {
                 board.playPieceMovingSound();
@@ -718,15 +725,32 @@ public class P2PChess {
         board.playPieceCheckmateSound();
         game.gameOver();
         showEndGameDialog("Checkmate");
+        if (networkConnection != null) { //Update other players game if online
+            sendEndGameFlag("CHECKMATE");
+        }
     }
 
     private void handleStalemate() {
         game.gameOver();
         showEndGameDialog("Stalemate");
+        if (networkConnection != null) { //Update other players game if online
+            sendEndGameFlag("STALEMATE");
+        }
     }
 
     public void handleTimeRanOut() {
         showEndGameDialog("Time");
+        if (networkConnection != null) { //Update other players game if online
+            sendEndGameFlag("TIME");
+        }
+    }
+
+    private void sendEndGameFlag(String type) {
+        try {
+            networkConnection.sendMove(type); // Using a specific method for clarity
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -1129,6 +1153,7 @@ public class P2PChess {
         Timer timer = new Timer(10, null);
         final int[] count = {0};
 
+        //Shakes the piece sideways
         timer.addActionListener(e -> {
             int dx = (count[0] % 2 == 0) ? 5 : -5;
             tileButton.setLocation(originalLocation.x + dx, originalLocation.y);
