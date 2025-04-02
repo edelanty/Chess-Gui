@@ -8,10 +8,13 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
@@ -257,15 +260,72 @@ public class P2PChess {
      * setupGui()
      * 
      * Adds all the required elements to the main panel used for this class in each area of the border layout.
+     * Additionally handles resizing to make sure the board stays square.
      * 
      */
     private void setupGui() {
         board.resetBoard();
-        chessBoardPanel.add(createChessBoardPanel(), BorderLayout.CENTER);
-        chessBoardPanel.add(createMoveHistoryPanel(), BorderLayout.EAST);
-        chessBoardPanel.add(createBlackCapturedPiecePanel(), BorderLayout.NORTH);
-        chessBoardPanel.add(createWhiteCapturedPiecePanel(), BorderLayout.SOUTH);
-        chessBoardPanel.add(createSidePanel(), BorderLayout.WEST);
+        //Create the chessboard panel
+        JPanel squareChessBoard = createChessBoardPanel();
+        //Create a wrapper panel to maintain square aspect ratio
+        JPanel squareWrapper = new JPanel(new GridBagLayout());
+        squareWrapper.add(squareChessBoard);
+        //Create the other panels
+        JPanel moveHistoryPanel = createMoveHistoryPanel();
+        JPanel blackCapturedPanel = createBlackCapturedPiecePanel();
+        JPanel whiteCapturedPanel = createWhiteCapturedPiecePanel();
+        JPanel sidePanel = createSidePanel();
+        //Add panels to the main chessBoardPanel
+        chessBoardPanel.setLayout(new BorderLayout());
+        chessBoardPanel.add(squareWrapper, BorderLayout.CENTER);
+        chessBoardPanel.add(moveHistoryPanel, BorderLayout.EAST);
+        chessBoardPanel.add(blackCapturedPanel, BorderLayout.NORTH);
+        chessBoardPanel.add(whiteCapturedPanel, BorderLayout.SOUTH);
+        chessBoardPanel.add(sidePanel, BorderLayout.WEST);
+
+        refactorResizing(squareChessBoard, moveHistoryPanel);
+    }
+
+    /**
+     * refactorResizing()
+     * 
+     * Makes sure that the chess board is ALWAYS square no matter what window size, dynamically adjusts the sizes of all panels.
+     * 
+     * @param squareChessBoard
+     * @param moveHistoryPanel
+     */
+    private void refactorResizing(JPanel squareChessBoard, JPanel moveHistoryPanel) {
+        chessBoardPanel.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                int totalWidth = chessBoardPanel.getWidth();
+                int totalHeight = chessBoardPanel.getHeight();
+                //Ensure minimum height for captured piece panels
+                int minCapturedPanelHeight = 60;
+                int maxCapturedPanelHeight = 100;
+                //Calculate how much space remains after allocating captured panels
+                int remainingHeight = totalHeight - (2 * minCapturedPanelHeight);
+                //The chessboard must be square, so take the minimum of width and remaining height
+                int boardSize = Math.min(totalWidth, remainingHeight);
+                //Calculate actual height left after determining board size
+                int availableExtraHeight = totalHeight - boardSize;
+                int capturedPanelHeight = Math.max(minCapturedPanelHeight, Math.min(availableExtraHeight / 2, maxCapturedPanelHeight));
+                //Ensure side panels take up remaining width dynamically
+                int remainingWidth = totalWidth - boardSize;
+                int sidePanelWidth = Math.max(remainingWidth / 2, 150);
+                //Apply new sizes
+                squareChessBoard.setPreferredSize(new Dimension(boardSize, boardSize));
+                moveHistoryPanel.setPreferredSize(new Dimension(sidePanelWidth, totalHeight));
+                sidePanel.setPreferredSize(new Dimension(sidePanelWidth, totalHeight));
+                blackCapturedPanel.setPreferredSize(new Dimension(totalWidth, capturedPanelHeight));
+                whiteCapturedPanel.setPreferredSize(new Dimension(totalWidth, capturedPanelHeight));
+                //Apply updates
+                SwingUtilities.invokeLater(() -> {
+                    chessBoardPanel.revalidate();
+                    chessBoardPanel.repaint();
+                });
+            }
+        });
     }
 
     /**
