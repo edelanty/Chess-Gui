@@ -42,7 +42,8 @@ Support for Windows, MacOS, and Linux machines!
    ```sh
    https://www.oracle.com/java/technologies/downloads/
    ```
-**OR**
+    **OR**
+
    ```sh
    https://openjdk.org/projects/jdk/21/
    ```
