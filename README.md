@@ -1,6 +1,6 @@
 # Chess Gui - Java Chess Game
 
-This program is a Java-based chess gui with a peer-to-peer connection online mode, bot support through the Stockfish engine, move highlighting for beginners, and various settings customization options including sound!f
+This program is a Java-based chess gui with a peer-to-peer connection online mode, bot support through the Stockfish engine, move highlighting for beginners, and various settings customization options including sound!
 
 Support for Windows, MacOS, and Linux machines!
 
@@ -40,8 +40,10 @@ Support for Windows, MacOS, and Linux machines!
 ## Installation
 1. Install Java 21:
    ```sh
-   https://www.oracle.com/java/technologies/downloads/#java21
-   or
+   https://www.oracle.com/java/technologies/downloads/
+   ```
+**OR**
+   ```sh
    https://openjdk.org/projects/jdk/21/
    ```
 2. Install the Stockfish Engine:
