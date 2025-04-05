@@ -55,6 +55,10 @@ public class StartScreen {
         this.hasOnlineGameStarted = hasOnlineGameStarted;
     }
 
+    public void sethasAIGameStarted(boolean hasAIGameStarted) {
+        this.hasAIGameStarted = hasAIGameStarted;
+    }
+
     public JPanel getStartScreenPanel() {
         return startScreenPanel;
     }
@@ -136,7 +140,6 @@ public class StartScreen {
                 SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/select.wav"));
                 if (!hasAIGameStarted) {
                     cardLayout.show(mainPanel, "AI Select Screen");
-                    hasAIGameStarted = true;
                 } else {
                     cardLayout.show(mainPanel, "AI2P Chess");
                 }

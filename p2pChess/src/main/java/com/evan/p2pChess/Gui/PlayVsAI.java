@@ -11,18 +11,24 @@ public class PlayVsAI {
     private JComboBox<String> colorChoice;
     private JComboBox<String> eloChoice;
     private JButton startGameButton;
+    private JButton backButton;
     private CardLayout cardLayout;
     private JPanel mainPanel;
     private Uci uci;
     private com.evan.p2pChess.Color playercolor;
     private P2PChess ai2PChess;
+    private StartScreen startScreen;
+    private String engineChoice;
 
-    public PlayVsAI(CardLayout cardLayout, JPanel mainPanel, Uci uci, com.evan.p2pChess.Color playerColor, P2PChess ai2PChess) {
+    public PlayVsAI(CardLayout cardLayout, JPanel mainPanel, Uci uci, com.evan.p2pChess.Color playerColor, P2PChess ai2PChess, StartScreen startScreen) {
         this.cardLayout = cardLayout;
         this.mainPanel = mainPanel;
         this.uci = uci;
         this.playercolor = playerColor;
         this.ai2PChess = ai2PChess;
+        this.engineChoice = "stockfish";
+        this.startScreen = startScreen;
+        this.backButton = new JButton("Back");
         this.aiPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -127,10 +133,10 @@ public class PlayVsAI {
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        JPanel buttonsRow = new JPanel();
-        buttonsRow.setOpaque(false);
-        buttonsRow.setLayout(new BoxLayout(buttonsRow, BoxLayout.X_AXIS));
-        buttonsRow.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JPanel buttonsCol = new JPanel();
+        buttonsCol.setOpaque(false);
+        buttonsCol.setLayout(new BoxLayout(buttonsCol, BoxLayout.Y_AXIS));
+        buttonsCol.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         startGameButton = new JButton("Start Game");
         startGameButton.setMaximumSize(new Dimension(300, 60));
@@ -140,10 +146,22 @@ public class PlayVsAI {
         startGameButton.setForeground(Color.BLACK);
         startGameButton.setFocusPainted(false);
         startGameButton.setBorder(BorderFactory.createRaisedBevelBorder());
-        buttonsRow.add(Box.createHorizontalStrut(30));
-        buttonsRow.add(startGameButton);
 
-        panel.add(buttonsRow);
+        buttonsCol.add(startGameButton);
+
+        backButton.setFont(new Font("Arial", Font.BOLD, 20));
+        backButton.setMaximumSize(new Dimension(300, 60));
+        backButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        backButton.setFont(new Font("Arial", Font.BOLD, 24));
+        backButton.setBackground(Settings.WHITE_COLOR);
+        backButton.setForeground(Color.BLACK);
+        backButton.setFocusPainted(false);
+        backButton.setBorder(BorderFactory.createRaisedBevelBorder());
+
+        buttonsCol.add(Box.createVerticalStrut(30));
+        buttonsCol.add(backButton);
+
+        panel.add(buttonsCol);
         panel.add(Box.createVerticalStrut(40));
 
         return panel;
@@ -156,8 +174,8 @@ public class PlayVsAI {
             String selectedColor = colorChoice.getSelectedItem().toString();
             int selectedElo = Integer.parseInt(eloChoice.getSelectedItem().toString());
 
-            // Initialize and configure UCI engine
-            uci.start("stockfish");
+            //Initialize and configure UCI engine
+            uci.start(engineChoice);
             uci.setAIDifficulty(selectedElo);
 
             //Set the color
@@ -170,11 +188,22 @@ public class PlayVsAI {
                 ai2PChess.playAIMove();
             }
 
+            startScreen.sethasAIGameStarted(true);
+
             //Pass selectedColor and uci into game logic
             cardLayout.show(mainPanel, "AI2P Chess");
         });
 
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/select.wav"));
+                cardLayout.show(mainPanel, "Start Screen");
+            }
+        });
+
         setupMouseListeners(startGameButton);
+        setupMouseListeners(backButton);
     }
 
     private void setupMouseListeners(JButton button) {

@@ -33,7 +33,7 @@ public class Gui {
         P2PChess p2pChess = new P2PChess(cardLayout, mainPanel, settings, game, Gamemode.HUMAN_VS_HUMAN, uci);
         P2PChess ai2pChess = new P2PChess(cardLayout, mainPanel, settings, game, Gamemode.HUMAN_VS_AI, uci);
         P2PChess onlineP2PChess = new P2PChess(cardLayout, mainPanel, settings, game, Gamemode.HUMAN_VS_HUMAN, uci);
-        PlayVsAI selectScreen = new PlayVsAI(cardLayout, mainPanel, uci, playerColor, ai2pChess);
+        PlayVsAI selectScreen = new PlayVsAI(cardLayout, mainPanel, uci, playerColor, ai2pChess, startScreen);
         PlayOnline connectionScreen = new PlayOnline(cardLayout, mainPanel, onlineP2PChess, startScreen);
         startScreen.runGui();
         selectScreen.runGui();
