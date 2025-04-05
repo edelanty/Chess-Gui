@@ -51,6 +51,10 @@ public class StartScreen {
         this.hasOnlineGameStarted = false;
     }
 
+    public void sethasOnlineGameStarted(boolean hasOnlineGameStarted) {
+        this.hasOnlineGameStarted = hasOnlineGameStarted;
+    }
+
     public JPanel getStartScreenPanel() {
         return startScreenPanel;
     }
@@ -147,7 +151,6 @@ public class StartScreen {
                 SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/select.wav"));
                 if (!hasOnlineGameStarted) {
                     cardLayout.show(mainPanel, "Connect Screen");
-                    hasOnlineGameStarted = true;
                 } else {
                     cardLayout.show(mainPanel, "Online Chess");
                 }

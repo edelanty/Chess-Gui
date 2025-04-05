@@ -817,7 +817,7 @@ public class P2PChess {
 
     private void sendEndGameFlag(String type) {
         try {
-            networkConnection.sendMove(type); // Using a specific method for clarity
+            networkConnection.sendMove(type);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -1518,6 +1518,12 @@ public class P2PChess {
         //Reset the move list table
         DefaultTableModel model = (DefaultTableModel) moveHistoryTable.getModel();
         model.setRowCount(0); //Clear all rows
+        //Reset the captured piece displays
+        whiteCapturedPieceArea.setText("");
+        blackCapturedPieceArea.setText("");
+        //Reset the captured piece area score
+        whiteScore.setText("0");
+        blackScore.setText("0");
         //Reset the timers based on the time selection
         whiteTimerLabel.setText("White: " + settings.getTimeSelection().toString() + ":00");
         blackTimerLabel.setText("Black: " + settings.getTimeSelection().toString() + ":00");

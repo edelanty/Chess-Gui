@@ -19,14 +19,18 @@ import java.io.IOException;
 public class PlayOnline {
     private JPanel onlinePanel;
     private JButton startGameButton;
+    private JButton backButton;
     private CardLayout cardLayout;
     private JPanel mainPanel;
     private P2PChess p2pChess;
+    private StartScreen startScreen;
 
-    public PlayOnline(CardLayout cardLayout, JPanel mainPanel, P2PChess p2pChess) {
+    public PlayOnline(CardLayout cardLayout, JPanel mainPanel, P2PChess p2pChess, StartScreen startScreen) {
         this.cardLayout = cardLayout;
         this.mainPanel = mainPanel;
         this.p2pChess = p2pChess;
+        this.startScreen = startScreen;
+        this.backButton = new JButton("Back");
         this.onlinePanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -145,7 +149,7 @@ public class PlayOnline {
                         try {
                             server.waitForConnection();
                             SwingUtilities.invokeLater(() -> {
-                                ipDialog.dispose(); // Close the dialog when player connects
+                                ipDialog.dispose();
                                 JOptionPane.showMessageDialog(null, "Player connected! Starting game...");
                                 p2pChess.startOnlineGame(server, true);
                                 cardLayout.show(mainPanel, "Online Chess");
@@ -269,10 +273,10 @@ public class PlayOnline {
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        JPanel buttonsRow = new JPanel();
-        buttonsRow.setOpaque(false);
-        buttonsRow.setLayout(new BoxLayout(buttonsRow, BoxLayout.X_AXIS));
-        buttonsRow.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JPanel buttonsCol = new JPanel();
+        buttonsCol.setOpaque(false);
+        buttonsCol.setLayout(new BoxLayout(buttonsCol, BoxLayout.Y_AXIS));
+        buttonsCol.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         startGameButton = new JButton("Start Game");
         startGameButton.setMaximumSize(new Dimension(300, 60));
@@ -282,10 +286,23 @@ public class PlayOnline {
         startGameButton.setForeground(Color.BLACK);
         startGameButton.setFocusPainted(false);
         startGameButton.setBorder(BorderFactory.createRaisedBevelBorder());
-        buttonsRow.add(Box.createHorizontalStrut(30));
-        buttonsRow.add(startGameButton);
 
-        panel.add(buttonsRow);
+        buttonsCol.add(startGameButton);
+
+        backButton.setFont(new Font("Arial", Font.BOLD, 20));
+        backButton.setMaximumSize(new Dimension(300, 60));
+        backButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        backButton.setFont(new Font("Arial", Font.BOLD, 24));
+        backButton.setBackground(Settings.WHITE_COLOR);
+        backButton.setForeground(Color.BLACK);
+        backButton.setFocusPainted(false);
+        backButton.setBorder(BorderFactory.createRaisedBevelBorder());
+        setupMouseListeners(backButton);
+
+        buttonsCol.add(Box.createVerticalStrut(30));
+        buttonsCol.add(backButton);
+
+        panel.add(buttonsCol);
         panel.add(Box.createVerticalStrut(40));
 
         return panel;
@@ -307,6 +324,7 @@ public class PlayOnline {
                                 SwingUtilities.invokeLater(() -> {
                                     JOptionPane.showMessageDialog(null, "Player connected! Starting game...");
                                     p2pChess.startOnlineGame(server, true);
+                                    startScreen.sethasOnlineGameStarted(true);
                                     cardLayout.show(mainPanel, "Online Chess");
                                 });
                             } catch (IOException ex) {
@@ -317,6 +335,7 @@ public class PlayOnline {
                         Client client = new Client(mode, 5000);
                         JOptionPane.showMessageDialog(null, "Connected to " + mode);
                         p2pChess.startOnlineGame(client, false);
+                        startScreen.sethasOnlineGameStarted(true);
                         cardLayout.show(mainPanel, "Online Chess");
                     }
                 }
@@ -326,6 +345,14 @@ public class PlayOnline {
         });
     
         setupMouseListeners(startGameButton);
+
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/select.wav"));
+                cardLayout.show(mainPanel, "Start Screen");
+            }
+        });
     }
 
     private void setupMouseListeners(JButton button) {
