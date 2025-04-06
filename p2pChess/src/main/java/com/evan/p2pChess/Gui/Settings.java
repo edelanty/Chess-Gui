@@ -246,7 +246,7 @@ public class Settings {
     }
 
     private JButton createResizedIconButton(String path, int width, int height) {
-        ImageIcon icon = new ImageIcon(getClass().getResource(path));
+        ImageIcon icon = new ImageIcon(this.getClass().getResource(path));
         Image scaled = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
         JButton button = new JButton(new ImageIcon(scaled));
         button.setContentAreaFilled(false);
