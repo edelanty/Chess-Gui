@@ -81,7 +81,7 @@ public class Settings {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                ImageIcon background = new ImageIcon(getClass().getResource("Images/Start Screen/start_screen.jpg"));
+                ImageIcon background = new ImageIcon(getClass().getResource("Images/Startscreen/start_screen.jpg"));
                 if (background.getImage() != null) {
                     g.drawImage(background.getImage(), 0, 0, getWidth(), getHeight(), this);
                 }
@@ -92,9 +92,9 @@ public class Settings {
         this.onlineP2PChess = null;
         this.backButton = new JButton("Back");
         this.soundCheckbox = new JCheckBox("Enable Sound");
-        this.bulletModeButton = createResizedIconButton("/com/evan/p2pChess/Gui/Images/Game Mode/bullet.png", 200, 125);
-        this.blitzModeButton = createResizedIconButton("/com/evan/p2pChess/Gui/Images/Game Mode/blitz.png", 200, 125);
-        this.standardModeButton = createResizedIconButton("/com/evan/p2pChess/Gui/Images/Game Mode/standard.png", 200, 125);
+        this.bulletModeButton = createResizedIconButton("/com/evan/p2pChess/Gui/Images/Gamemode/bullet.png", 200, 125);
+        this.blitzModeButton = createResizedIconButton("/com/evan/p2pChess/Gui/Images/Gamemode/blitz.png", 200, 125);
+        this.standardModeButton = createResizedIconButton("/com/evan/p2pChess/Gui/Images/Gamemode/standard.png", 200, 125);
         this.primaryColor = WHITE_COLOR;
         this.alternativeColor = BROWN_COLOR;
         this.timeSelection = 1;
@@ -335,7 +335,7 @@ public class Settings {
         return panel;
     }
 
-    /**
+        /**
      * highlightSelectedMode()
      * 
      * Sets all the buttons borders off when a different mode is selected.
@@ -350,6 +350,20 @@ public class Settings {
     }    
 
     private void setupListeners() {
+        setupBackButton();
+        setupTimeModeButton(bulletModeButton, BULLET_TIME);
+        setupTimeModeButton(blitzModeButton, BLITZ_TIME);
+        setupTimeModeButton(standardModeButton, STANDARD_TIME);
+
+        soundCheckbox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setIsSoundEnabled(!isSoundEnabled);
+            }
+        });
+    }
+
+    private void setupBackButton() {
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -371,100 +385,37 @@ public class Settings {
                 backButton.setBackground(Settings.WHITE_COLOR);
             }
         });
+    }
 
-        bulletModeButton.addActionListener(new ActionListener() {
+    private void setupTimeModeButton(JButton button, Integer timeMode) {
+        button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/select.wav"));
 
                 if (!p2pChess.getHasFirstMove()) { //For the play against human option
-                    setTimeSelection(BULLET_TIME);
-                    p2pChess.setWhiteTimerLabel(BULLET_TIME.toString());
-                    p2pChess.setBlackTimerLabel(BULLET_TIME.toString());
-                    highlightSelectedMode(bulletModeButton);
+                    setGameModeTime(p2pChess, timeMode);
+                    highlightSelectedMode(button);
                 }
 
                 if (!ai2pChess.getHasFirstMove()) { //For the play against AI option
-                    setTimeSelection(BULLET_TIME);
-                    ai2pChess.setWhiteTimerLabel(BULLET_TIME.toString());
-                    ai2pChess.setBlackTimerLabel(BULLET_TIME.toString());
-                    highlightSelectedMode(bulletModeButton);
+                    setGameModeTime(ai2pChess, timeMode);
+                    highlightSelectedMode(button);
                 }
 
                 if (!onlineP2PChess.getHasFirstMove()) { //For the play online option
-                    setTimeSelection(BULLET_TIME);
-                    onlineP2PChess.setWhiteTimerLabel(BULLET_TIME.toString());
-                    onlineP2PChess.setBlackTimerLabel(BULLET_TIME.toString());
-                    onlineP2PChess.updateOtherClientSettings(BULLET_TIME);
-                    highlightSelectedMode(bulletModeButton);
+                    setGameModeTime(onlineP2PChess, timeMode);
+                    onlineP2PChess.updateOtherClientSettings(timeMode);
+                    highlightSelectedMode(button);
                 }
             }
         });
+    }
 
-        blitzModeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/select.wav"));
-
-                if (!p2pChess.getHasFirstMove()) { //For the play against human option
-                    setTimeSelection(BLITZ_TIME);
-                    p2pChess.setWhiteTimerLabel(BLITZ_TIME.toString());
-                    p2pChess.setBlackTimerLabel(BLITZ_TIME.toString());
-                    highlightSelectedMode(blitzModeButton);
-                }
-
-                if (!ai2pChess.getHasFirstMove()) { //For the play against AI option
-                    setTimeSelection(BLITZ_TIME);
-                    ai2pChess.setWhiteTimerLabel(BLITZ_TIME.toString());
-                    ai2pChess.setBlackTimerLabel(BLITZ_TIME.toString());
-                    highlightSelectedMode(blitzModeButton);
-                }
-
-                if (!onlineP2PChess.getHasFirstMove()) { //For the play online option
-                    setTimeSelection(BLITZ_TIME);
-                    onlineP2PChess.setWhiteTimerLabel(BLITZ_TIME.toString());
-                    onlineP2PChess.setBlackTimerLabel(BLITZ_TIME.toString());
-                    onlineP2PChess.updateOtherClientSettings(BLITZ_TIME);
-                    highlightSelectedMode(blitzModeButton);
-                }
-            }
-        });
-
-        standardModeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SoundManager.play(getClass().getResource("/com/evan/p2pChess/Gui/Sounds/select.wav"));
-
-                if (!p2pChess.getHasFirstMove()) { //For the play against human option
-                    setTimeSelection(STANDARD_TIME);
-                    p2pChess.setWhiteTimerLabel(STANDARD_TIME.toString());
-                    p2pChess.setBlackTimerLabel(STANDARD_TIME.toString());
-                    highlightSelectedMode(standardModeButton);
-                }
-
-                if (!ai2pChess.getHasFirstMove()) { //For the play against AI option
-                    setTimeSelection(STANDARD_TIME);
-                    ai2pChess.setWhiteTimerLabel(STANDARD_TIME.toString());
-                    ai2pChess.setBlackTimerLabel(STANDARD_TIME.toString());
-                    highlightSelectedMode(standardModeButton);
-                }
-
-                if (!onlineP2PChess.getHasFirstMove()) { //For the play online option
-                    setTimeSelection(STANDARD_TIME);
-                    onlineP2PChess.setWhiteTimerLabel(STANDARD_TIME.toString());
-                    onlineP2PChess.setBlackTimerLabel(STANDARD_TIME.toString());
-                    onlineP2PChess.updateOtherClientSettings(STANDARD_TIME);
-                    highlightSelectedMode(standardModeButton);
-                }
-            }
-        });
-
-        soundCheckbox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setIsSoundEnabled(!isSoundEnabled);
-            }
-        });
+    private void setGameModeTime(P2PChess instance, Integer timeMode) {
+        setTimeSelection(timeMode);
+        instance.setWhiteTimerLabel(timeMode.toString());
+        instance.setBlackTimerLabel(timeMode.toString());
     }
 
 }

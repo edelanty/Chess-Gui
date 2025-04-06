@@ -1,0 +1,9 @@
+Package: chess
+Version: 1.0.0
+Section: games
+Depends: default-jre (>= 21) | default-jre-headless (>= 21) | openjdk-21-jre | openjdk-21-jre-headless, stockfish
+Recommends: stockfish
+Priority: optional
+Architecture: all
+Maintainer: Evan Delanty <edelanty@zagmail.gonzaga.edu>
+Description: Chess GUI

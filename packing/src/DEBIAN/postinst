@@ -1,0 +1,7 @@
+#!/bin/sh
+
+set -e
+
+echo "To use the full features of this chess package, please install Stockfish manually:"
+echo "  sudo apt-get install stockfish"
+echo "Find the game at /usr/bin/p2pChess"

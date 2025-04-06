@@ -35,7 +35,7 @@ public class PlayOnline {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                ImageIcon background = new ImageIcon(getClass().getResource("Images/Start Screen/start_screen.jpg"));
+                ImageIcon background = new ImageIcon(getClass().getResource("Images/Startscreen/start_screen.jpg"));
                 if (background.getImage() != null) {
                     g.drawImage(background.getImage(), 0, 0, getWidth(), getHeight(), this);
                 }
