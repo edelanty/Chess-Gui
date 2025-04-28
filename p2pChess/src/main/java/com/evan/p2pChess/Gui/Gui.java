@@ -1,12 +1,15 @@
 package com.evan.p2pChess.Gui;
 
-import javax.swing.*;
+import java.awt.CardLayout;
+import java.awt.Color;
+
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import com.evan.p2pChess.Game;
 import com.evan.p2pChess.Gamemode;
 import com.evan.p2pChess.Uci;
-
-import java.awt.*;
 
 public class Gui {
     private JFrame mainWindowFrame;
@@ -60,9 +63,21 @@ public class Gui {
         mainWindowFrame.setSize(1200, 800);
         mainWindowFrame.pack();
         mainWindowFrame.setLocationRelativeTo(null); //Center
+        setAppIcon();
 
         //Show the window
         cardLayout.show(mainPanel, "Start Screen");
+    }
+
+    /**
+     * setAppIcon()
+     * 
+     * Set's the frames icon.
+     * 
+     */
+    private void setAppIcon() {
+        ImageIcon icon = new ImageIcon("packing/chessIcon.png");
+        mainWindowFrame.setIconImage(icon.getImage());
     }
 
     /**

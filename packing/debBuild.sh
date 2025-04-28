@@ -31,8 +31,12 @@ cp p2pChess/target/p2pChess-1.0.jar $TEMP_DIR/usr/bin/
 chmod 644 $TEMP_DIR/usr/bin/p2pChess-1.0.jar # Linting
 
 # .desktop file into place
-cp packing/src/chess.desktop $TEMP_DIR/usr/share/applications/
+cp packing/src/usr/share/applications/chess.desktop $TEMP_DIR/usr/share/applications/
 chmod 644 $TEMP_DIR/usr/share/applications/chess.desktop
+
+# Chess icon into place
+cp packing/chessIcon.png $TEMP_DIR/usr/share/applications/
+chmod 644 $TEMP_DIR/usr/share/applications/chessIcon.png
 
 # Configuration file in place
 cp packing/src/chess.conf $TEMP_DIR/etc/

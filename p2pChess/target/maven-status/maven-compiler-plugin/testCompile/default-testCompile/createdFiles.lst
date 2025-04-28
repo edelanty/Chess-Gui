@@ -1,5 +1,5 @@
 com/evan/p2pChess/FenNotationGeneratorTest.class
 com/evan/p2pChess/CastleTest.class
 com/evan/p2pChess/PieceMovementTest.class
-com/evan/p2pChess/CheckmateTest.class
 com/evan/p2pChess/UciTest.class
+com/evan/p2pChess/CheckmateTest.class

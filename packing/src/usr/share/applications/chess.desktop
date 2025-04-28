@@ -3,6 +3,6 @@ Type=Application
 Version=1.0.0
 Name=Chess Gui
 Exec=java -jar /usr/bin/p2pChess-1.0.jar
-Icon=
+Icon=/usr/share/applications/chessIcon.png
 Terminal=false
 Categories=Game;Java;
