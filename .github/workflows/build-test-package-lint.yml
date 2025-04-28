@@ -1,0 +1,78 @@
+name: build-testing-packaging yml
+run-name: ${{ github.actor }} Build-Testing-Packaging on Push Workflow
+on: [push]
+jobs:
+#*********************************************
+  build:
+    name: "Build"
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+      - name: Install Stockfish
+        run: | 
+          sudo apt install stockfish
+      - name: Build project
+        run: |
+          make build
+#*********************************************
+  test:
+    name: "Test"
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+      - name: Install Stockfish
+        run: | 
+          sudo apt install stockfish
+      - name: Test project
+        run: |
+          make test
+#*********************************************
+  build-deb:
+    name: "Build Debian Package"
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+      - name: Install Stockfish
+        run: | 
+          sudo apt install stockfish
+      - name: Build deb
+        run: |
+          make build-deb
+      - name: Save JAR file
+        uses: actions/upload-artifact@v4
+        with:
+          name: counter jar
+          path: counterapp/target/*.jar
+#*********************************************
+  lint-debian-package:
+    name: "Lint Debian Package"
+    needs: build-deb
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lint Debian Package
+        run: |
+          sudo apt-get install lintian
+          make lint-deb
+      - run: echo "${{ job.status }}."
