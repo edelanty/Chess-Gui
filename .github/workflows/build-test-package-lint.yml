@@ -1,6 +1,10 @@
 name: build-testing-packaging yml
 run-name: ${{ github.actor }} Build-Testing-Packaging on Push Workflow
 on: [push]
+
+env:
+  JAVA_TOOL_OPTIONS: "-Djava.awt.headless=true"
+
 jobs:
 #*********************************************
   build:
@@ -16,7 +20,7 @@ jobs:
           java-version: '21'
       - name: Install Stockfish
         run: | 
-          sudo apt install stockfish
+          sudo apt-get install -y stockfish
       - name: Build project
         run: |
           make build
@@ -35,7 +39,7 @@ jobs:
           java-version: '21'
       - name: Install Stockfish
         run: | 
-          sudo apt install stockfish
+          sudo apt-get install -y stockfish
       - name: Test project
         run: |
           make test
@@ -54,7 +58,7 @@ jobs:
           java-version: '21'
       - name: Install Stockfish
         run: | 
-          sudo apt install stockfish
+          sudo apt-get install -y stockfish
       - name: Build deb
         run: |
           make build-deb
@@ -73,6 +77,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Lint Debian Package
         run: |
-          sudo apt-get install lintian
+          sudo apt-get install -y lintian
           make lint-deb
       - run: echo "${{ job.status }}."
