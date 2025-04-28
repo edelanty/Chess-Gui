@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Version=1.0.0
+Name=Chess Gui
+Exec=java -jar /usr/bin/p2pChess-1.0.jar
+Icon=
+Terminal=false
+Categories=Game;Java;

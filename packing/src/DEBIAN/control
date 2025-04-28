@@ -5,5 +5,5 @@ Depends: default-jre (>= 21) | default-jre-headless (>= 21) | openjdk-21-jre | o
 Recommends: stockfish
 Priority: optional
 Architecture: all
-Maintainer: Evan Delanty <edelanty@zagmail.gonzaga.edu>
+Maintainer: Evan Delanty <efdelanty@gmail.com>
 Description: Chess GUI
