@@ -62,8 +62,8 @@ jobs:
       - name: Save JAR file
         uses: actions/upload-artifact@v4
         with:
-          name: counter jar
-          path: counterapp/target/*.jar
+          name: chess jar
+          path: p2pChess/target/*.jar
 #*********************************************
   lint-debian-package:
     name: "Lint Debian Package"
