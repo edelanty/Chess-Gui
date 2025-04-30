@@ -64,6 +64,11 @@ jobs:
         with:
           name: chess jar
           path: p2pChess/target/*.jar
+      - name: Save DEB file
+        uses: actions/upload-artifact@v4
+        with:
+          name: chess deb
+          path: *.deb
 #*********************************************
   lint-debian-package:
     name: "Lint Debian Package"
