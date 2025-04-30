@@ -68,7 +68,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: chess deb
-          path: *.deb
+          path: '*.deb'
 #*********************************************
   lint-debian-package:
     name: "Lint Debian Package"
